@@ -123,7 +123,7 @@ update(1);
 // update the elements
 function update(nRadius) {
 
-  var n = nRadius/10;
+  var n = nRadius;
 
   // adjust the text on the range slider
   d3.select("#nRadius-value").text(n);
