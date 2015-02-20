@@ -118,7 +118,7 @@ d3.select("#nRadius").on("input", function() {
 });
 
 // Initial starting radius of the circle
-update(12);
+update(1);
 
 // update the elements
 function update(nRadius) {
@@ -135,9 +135,14 @@ function update(nRadius) {
 
   //end = nRadius;
 
+  // This is what updates the values from the slider into the new spiral
   var newData = d3.range(0, 12 * Math.PI, .01).map(function(t) {
-    return [t, 6*(Math.exp((t*(nRadius))/(2*Math.PI))-1)/(Math.exp(.5*6)-1)];
+    return [t, 6*(Math.exp((t*(nRadius))/(2*Math.PI))-1)/(Math.exp(nRadius*6)-1)];
   });
+
+  svg.selectAll(".line")
+    .datum(newData)
+    .attr("d", line)
 
 /*
   radius = d3.scale.linear()
