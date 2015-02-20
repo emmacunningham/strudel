@@ -123,9 +123,10 @@ update(1);
 // update the elements
 function update(nRadius) {
 
+  var n = nRadius/10;
 
   // adjust the text on the range slider
-  d3.select("#nRadius-value").text(nRadius);
+  d3.select("#nRadius-value").text(n);
   d3.select("#nRadius").property("value", nRadius);
   /*
   // update the rircle radius
@@ -134,10 +135,9 @@ function update(nRadius) {
   */
 
   //end = nRadius;
-
   // This is what updates the values from the slider into the new spiral
   var newData = d3.range(0, 12 * Math.PI, .01).map(function(t) {
-    return [t, 6*(Math.exp((t*(nRadius))/(2*Math.PI))-1)/(Math.exp(nRadius*6)-1)];
+    return [t, 6*(Math.exp((t*(n))/(2*Math.PI))-1)/(Math.exp(n*6)-1)];
   });
 
   svg.selectAll(".line")
