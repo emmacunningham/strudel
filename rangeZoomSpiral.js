@@ -3,8 +3,8 @@ var numRevolutions = 6;
 
 // v and d are the range of the zoom.  We will make these user manipulable
 // when everything else works like gravy.
-var v = 1;
-var d = 0;
+var v = 4;
+var d = 3;
 
 // This was defined as a constant in paul's demo.  ????
 var b = 5/6;
@@ -194,8 +194,10 @@ d3.selectAll(".rangeSlider").on("input", function() {
       break;
   }
 
-  if (Math.abs(d - v) != 0) {
-    update(d, v);
+  if (Math.abs(d - v) == 0) {
+  }
+  else {
+    update(Number(d), Number(v));
   }
 });
 
