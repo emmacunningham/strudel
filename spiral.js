@@ -1,3 +1,11 @@
+// Eventually we'll want to make this user controllable too, I'd imagine.
+var numRevolutions = 6;
+
+// t corresponds to theta, n corresponds to zoom value, r is the num of revolutions
+var spiralF = function(t, n, r) {
+  return r*(Math.exp((t*n)/(2*Math.PI))-1)/(Math.exp(n*r)-1);
+};
+
 
 // This function takes a Number n and returns the function which
 // will generate the data points for the spiral.  I've abstracted it out
@@ -5,9 +13,9 @@
 // value of the input slider) in our update function below.  Note this replaces
 // our "data = " statement from previous versions as we are now dynamically
 // generating these data points.
-var inputDataGenerator = function(n) {
+var inputDataGenerator = function(n, rev) {
   var spiralDataGenerator = function(t) {
-    return [t, 6*(Math.exp((t*n)/(2*Math.PI))-1)/(Math.exp(n*6)-1)];
+    return [t, spiralF(t, n, rev)];
   };
   return spiralDataGenerator;
 };
@@ -19,6 +27,8 @@ var width = 960,
 
 
 // Generates function constraining domain and range of graph
+// From what I can tell manipulating the domain values, it seems to just
+// hange the scaling of the graph within the viewport.
 var r = d3.scale.linear()
     .domain([0, 6])
     .range([0, radius]);
@@ -65,7 +75,7 @@ function update(nRadius) {
   d3.select("#nRadius").property("value", nRadius);
 
   // Generates new data points based on the input value
-  var newData = d3.range(0, 12 * Math.PI, .01).map(inputDataGenerator(n));
+  var newData = d3.range(0, 12 * Math.PI, .01).map(inputDataGenerator(n, numRevolutions));
 
   // Apply those new data points.  D3 will use the radial line function
   // that we have previously defined above to map those values to Cartesian coordinates

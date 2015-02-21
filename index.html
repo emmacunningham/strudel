@@ -26,13 +26,27 @@
  </head>
  <body>
   <p>
+    <!--
     <label for="nRadius"
            style="display: inline-block; width: 240px; text-align: right">
            radius = <span id="nRadius-value">…</span>
     </label>
     <input type="range" min="-7" max="7" id="nRadius" step="0.1">
+    -->
+
+    <label for="d"
+           style="display: inline-block; width: 240px; text-align: right">
+           d = <span id="d-value">…</span>
+    </label>
+    <input type="range" min="0" max="6" id="d" class="rangeSlider" step="0.1">
+
+    <label for="v"
+           style="display: inline-block; width: 240px; text-align: right">
+           v = <span id="v-value">…</span>
+    </label>
+    <input type="range" min="0" max="6" id="v" class="rangeSlider" step="0.1">
   </p>
    <div id="chart"></div>
-   <script type="text/javascript" src="spiral.js"></script>
+   <script type="text/javascript" src="rangeZoomspiral.js"></script>
  </body>
 </html>
