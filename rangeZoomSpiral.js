@@ -3,8 +3,8 @@ var numRevolutions = 6;
 
 // v and d are the range of the zoom.  We will make these user manipulable
 // when everything else works like gravy.
-var v = 4;
-var d = 1;
+var v = 1;
+var d = 0;
 
 // This was defined as a constant in paul's demo.  ????
 var b = 5/6;
@@ -53,10 +53,9 @@ var getC = function(o, w, l, bigP) {
     return w - (o * Math.log(bigP));
   }
 
-  if (0 > bigP) {
-    return (3 * l) * ((w - .5) / (Math.abs(w - .5)));
+  if (bigP < 0) {
+    return (3 * l) * ((w - (l *.5)) / (Math.abs(w - (l *.5))));
   }
-
 
 };
 
@@ -77,12 +76,13 @@ var newHotness = function(theta, d, v, l) {
   //var l = numRevolutions;
 
   var z = getZ(d, v, l);
-  var p = getP(z, v, d);
+  var p = getP(z, d, v);
   var w = getW(d, v);
   var bigP = getBigP(p, l, w);
   var o = getO(d, v);
 
   var c = getC(o, w, l, bigP);
+
 
   var origData = spiralF(theta, p, l);
 
@@ -94,9 +94,7 @@ var newHotness = function(theta, d, v, l) {
   var newTop = newTopPartOne + newTopPartTwo;
   var newBottom = Math.exp(thetaOver2PiMinusC / o) + 1;
   var newStuff = newTop / newBottom;
-
   var result = newStuff * origData;
-
   return result;
 
 };
@@ -139,6 +137,7 @@ var width = 960,
 // Generates function constraining domain and range of graph
 // From what I can tell manipulating the domain values, it seems to just
 // hange the scaling of the graph within the viewport.
+
 var r = d3.scale.linear()
     .domain([0, 6])
     .range([0, radius]);
@@ -148,8 +147,16 @@ var r = d3.scale.linear()
 // used by the <path> element.  The function used in the angle setter is
 // changing the data values to orient the graph correctly.
 var line = d3.svg.line.radial()
-    .radius(function(d) { return r(d[1]); })
-    .angle(function(d) { return Math.PI / 2 - d[0]; });
+    .radius(function(data) {
+
+      return r(data[1]);
+
+    })
+    .angle(function(data) {
+
+      return Math.PI / 2 - data[0];
+
+    });
 
 // Create <svg> element, append it to body, set width and height based on variables
 // defined above.  Also create the <g> element which will contain the <path> element.
@@ -187,7 +194,9 @@ d3.selectAll(".rangeSlider").on("input", function() {
       break;
   }
 
-  update(d, v);
+  if (Math.abs(d - v) != 0) {
+    update(d, v);
+  }
 });
 
 // Initial starting value of input slider.
@@ -199,11 +208,13 @@ d3.select("#v").property("value", v);
 update(d,v);
 
 // Updates the spiral data per the value of the input range slider.
-function update(d, v) {
+function update(newD, newV) {
 
   // Generates new data points based on the input value
   //var newData = d3.range(0, 12 * Math.PI, .01).map(inputDataGenerator(n, numRevolutions));
-  var newData = d3.range(0, 12 * Math.PI, .01).map(newDataGenerator(d, v, numRevolutions));
+  var resolution = .1;
+  var revolutions = 12;
+  var newData = d3.range(0, revolutions * Math.PI, resolution).map(newDataGenerator(newD, newV, numRevolutions));
 
 
   // Apply those new data points.  D3 will use the radial line function
