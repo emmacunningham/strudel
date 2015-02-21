@@ -1,8 +1,4 @@
 
-var spiralF = function(t) {
-  return [t, 6*(Math.exp((t*(.5))/(2*Math.PI))-1)/(Math.exp(.5*6)-1)];
-};
-
 // Init width, height of graph container and radius of graph.
 var width = 960,
     height = 500,
