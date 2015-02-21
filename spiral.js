@@ -1,4 +1,17 @@
 
+// This function takes a Number n and returns the function which
+// will generate the data points for the spiral.  I've abstracted it out
+// here so we can just use inputDataGenerator (where n will usually be the
+// value of the input slider) in our update function below.  Note this replaces
+// our "data = " statement from previous versions as we are now dynamically
+// generating these data points.
+var inputDataGenerator = function(n) {
+  var spiralDataGenerator = function(t) {
+    return [t, 6*(Math.exp((t*n)/(2*Math.PI))-1)/(Math.exp(n*6)-1)];
+  };
+  return spiralDataGenerator;
+};
+
 // Init width, height of graph container and radius of graph.
 var width = 960,
     height = 500,
@@ -52,9 +65,7 @@ function update(nRadius) {
   d3.select("#nRadius").property("value", nRadius);
 
   // Generates new data points based on the input value
-  var newData = d3.range(0, 12 * Math.PI, .01).map(function(t) {
-    return [t, 6*(Math.exp((t*(n))/(2*Math.PI))-1)/(Math.exp(n*6)-1)];
-  });
+  var newData = d3.range(0, 12 * Math.PI, .01).map(inputDataGenerator(n));
 
   // Apply those new data points.  D3 will use the radial line function
   // that we have previously defined above to map those values to Cartesian coordinates
