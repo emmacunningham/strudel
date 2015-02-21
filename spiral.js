@@ -14,7 +14,7 @@ var r = d3.scale.linear()
 
 var line = d3.svg.line.radial()
     .radius(function(d) { return r(d[1]); })
-    .angle(function(d) { return d[0] + Math.PI / 2; });
+    .angle(function(d) { return Math.PI / 2 - d[0]; });
 
 var svg = d3.select("body").append("svg")
     .attr("width", width)
