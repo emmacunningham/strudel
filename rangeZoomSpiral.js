@@ -47,13 +47,31 @@ var getW = function(d, v) {
 };
 
 // Corresponds to 'c' function in paul's demo.
-var getC = function(w, l) {
+var getC = function(o, w, l, bigP) {
   //var l = numRevolutions;
-  return (3 * l) * ((w - .5) / (Math.abs(w - .5)));
+  if (bigP >= 0) {
+    return w - (o * Math.log(bigP));
+  }
+
+  if (0 > bigP) {
+    return (3 * l) * ((w - .5) / (Math.abs(w - .5)));
+  }
+
+
 };
 
 var twoPi = 2*Math.PI;
 
+var getBigP = function(p, l, w) {
+  var topPartOne = (2 * Math.exp(p * (l - w)));
+  var topPartTwo = Math.exp(l * p);
+  var top = topPartOne - topPartTwo - 1;
+  var bottomPartOne = 2 * Math.exp(w * p);
+  var bottomPartTwo = Math.exp(l * p);
+  var bottom = bottomPartOne - bottomPartTwo - 1;
+
+  return top / bottom;
+};
 
 var newHotness = function(theta, d, v, l) {
   //var l = numRevolutions;
@@ -61,8 +79,10 @@ var newHotness = function(theta, d, v, l) {
   var z = getZ(d, v, l);
   var p = getP(z, v, d);
   var w = getW(d, v);
-  var c = getC(w, l);
+  var bigP = getBigP(p, l, w);
   var o = getO(d, v);
+
+  var c = getC(o, w, l, bigP);
 
   var origData = spiralF(theta, p, l);
 
