@@ -3,8 +3,8 @@ var numRevolutions = 6;
 
 // v and d are the range of the zoom.  We will make these user manipulable
 // when everything else works like gravy.
-var v = 4;
-var d = 3;
+var v = 0;
+var d = 1;
 
 // This was defined as a constant in paul's demo.  ????
 var b = 5/6;
