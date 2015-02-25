@@ -1,27 +1,29 @@
 <!DOCTYPE html>
 <html>
  <head>
-   <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
-   <title>Archimedean Spiral</title>
-   <script type="text/javascript" src="http://d3js.org/d3.v2.js"></script>
-   <style>
-.frame {
-  fill: none;
-  stroke: #000;
-}
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+  <title>Archimedean Spiral</title>
+  <link rel="stylesheet" href="lib/colpick/css/colpick.css">
 
-.axis line,
-.axis circle {
-  fill: none;
-  stroke: #777;
-  stroke-dasharray: 1,4;
-}
+  <script type="text/javascript" src="http://d3js.org/d3.v2.js"></script>
+  <style>
+    .frame {
+      fill: none;
+      stroke: #000;
+    }
 
-.line {
-  fill: none;
-  stroke: red;
-  stroke-width: 1.5px;
-}
+    .axis line,
+    .axis circle {
+      fill: none;
+      stroke: #777;
+      stroke-dasharray: 1,4;
+    }
+
+    .line {
+      fill: none;
+      stroke: red;
+      stroke-width: 1.5px;
+    }
    </style>
  </head>
  <body>
@@ -44,7 +46,10 @@
            style="display: inline-block; width: 240px; text-align: right">
            rotations = <span id="r-value">…</span>
     </label>
+
     <input type="range" min="0" max="24" id="rotationSlider" step="0.1">
+
+    <br />
 
     <label for="d"
            style="display: inline-block; width: 240px; text-align: right">
@@ -56,15 +61,25 @@
            style="display: inline-block; width: 240px; text-align: right">
            v = <span id="v-value">…</span>
     </label>
-    <input type="range" min="0" max="6" id="v" step="0.1">
+    <input type="range" min="0" max="6" id="v" class="rangeSlider" step="0.1">
+
+    <br />
 
     <label for="path-weight"
            style="display: inline-block; width: 240px; text-align: right">
            path thickness = <span id="path-weight-value">…</span>
     </label>
     <input type="range" min=".25" max="5" id="path-weight" step="0.25">
+
+    <div id="color-picker" style="display: inline-block;"></div>
+
+
   </p>
-   <div id="chart"></div>
-   <script type="text/javascript" src="rangeZoomspiral.js"></script>
+
+
+  <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
+  <script type="text/javascript" src="lib/colpick/js/colpick.js"></script>
+
+  <script type="text/javascript" src="rangeZoomSpiral.js"></script>
  </body>
 </html>

@@ -198,11 +198,9 @@ d3.selectAll(".rangeSlider").on("input", function() {
       break;
   }
 
-  if (Math.abs(d - v) == 0) {
-  }
-  else {
-    update(Number(d), Number(v));
-  }
+
+  update(Number(d), Number(v));
+
 });
 
 // Initial starting value of input range sliders.
@@ -318,3 +316,20 @@ function updatePathWeight(n) {
 };
 
 updatePathWeight(pathWeight);
+
+// Color picker
+function updateColor(hsb,hex,rgb,el,bySetColor) {
+  var hexStr = '#' + hex;
+  svg.selectAll(".line")
+    .style('stroke', hexStr);
+
+};
+
+
+$('#color-picker').colpick({
+  flat:true,
+  layout:'hex',
+  submit:0,
+  onChange: updateColor,
+  color: '#ff0000'
+});
