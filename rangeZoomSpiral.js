@@ -1,6 +1,7 @@
 // Eventually we'll want to make this user controllable too, I'd imagine.
 var numRotations = 12;
 var resolution = .01;
+var pathWeight = 1;
 
 var scale = 6;
 
@@ -263,7 +264,7 @@ function updateRotations(n) {
 updateRotations(numRotations);
 
 // Select the <input> rotation element and attaches a listener to when the input
-// value changes.  On input change, call "updateRotations" function with the new value.
+// value changes.  On input change, call "updateResolution" function with the new value.
 d3.select("#resolutionSlider").on("input", function() {
   updateResolution(+Number(this.value));
 });
@@ -272,7 +273,7 @@ function updateResolution(n) {
 
   // adjust the text on the range slider
   d3.select("#res-value").text(n);
-  d3.select("#updateResolution").property("value", n);
+  d3.select("#resolutionSlider").property("value", n);
 
   resolution = n;
 
@@ -292,3 +293,28 @@ function updateResolution(n) {
 };
 
 updateResolution(resolution);
+
+// Select the <input> rotation element and attaches a listener to when the input
+// value changes.  On input change, call "updatePathWeight" function with the new value.
+d3.select("#path-weight").on("input", function() {
+  updatePathWeight(+Number(this.value));
+});
+
+function updatePathWeight(n) {
+
+  // adjust the text on the range slider
+  d3.select("#path-weight-value").text(n);
+  d3.select("#path-weight").property("value", n);
+
+  pathWeight = n;
+
+
+  // Apply those new data points.  D3 will use the radial line function
+  // that we have previously defined above to map those values to Cartesian coordinates
+  // so we need to update the value of the d attribute on the <path> element
+  svg.selectAll(".line")
+    .style('stroke-width', pathWeight + 'px');
+
+};
+
+updatePathWeight(pathWeight);
