@@ -1,5 +1,8 @@
 // Eventually we'll want to make this user controllable too, I'd imagine.
-var numRevolutions = 6;
+var numRotations = 12;
+var resolution = .01;
+
+var scale = 6;
 
 // v and d are the range of the zoom.  We will make these user manipulable
 // when everything else works like gravy.
@@ -201,7 +204,7 @@ d3.selectAll(".rangeSlider").on("input", function() {
   }
 });
 
-// Initial starting value of input slider.
+// Initial starting value of input range sliders.
 d3.select("#d-value").text(d);
 d3.select("#d").property("value", d);
 d3.select("#v-value").text(v);
@@ -214,9 +217,9 @@ function update(newD, newV) {
 
   // Generates new data points based on the input value
   //var newData = d3.range(0, 12 * Math.PI, .01).map(inputDataGenerator(n, numRevolutions));
-  var resolution = .1;
-  var revolutions = 12;
-  var newData = d3.range(0, revolutions * Math.PI, resolution).map(newDataGenerator(newD, newV, numRevolutions));
+  d = newD;
+  v = newV;
+  var newData = d3.range(0, numRotations * Math.PI, resolution).map(newDataGenerator(newD, newV, scale));
 
 
   // Apply those new data points.  D3 will use the radial line function
@@ -226,6 +229,35 @@ function update(newD, newV) {
     .datum(newData)
     .attr("d", line)
 
-}
+};
+
+// Select the <input> rotation element and attaches a listener to when the input
+// value changes.  On input change, call "updateRotations" function with the new value.
+d3.select("#rotationSlider").on("input", function() {
+  updateRotations(+Number(this.value));
+});
+
+function updateRotations(n) {
+
+  // adjust the text on the range slider
+  d3.select("#r-value").text(n);
+  d3.select("#rotationSlider").property("value", n);
+
+  numRotations = n;
+
+  // Generates new data points based on the input value
+  //var newData = d3.range(0, 12 * Math.PI, .01).map(inputDataGenerator(n, numRevolutions));
+
+  var newData = d3.range(0, n * Math.PI, resolution).map(newDataGenerator(d, v, scale));
 
 
+  // Apply those new data points.  D3 will use the radial line function
+  // that we have previously defined above to map those values to Cartesian coordinates
+  // so we need to update the value of the d attribute on the <path> element
+  svg.selectAll(".line")
+    .datum(newData)
+    .attr("d", line)
+
+};
+
+updateRotations(numRotations);
