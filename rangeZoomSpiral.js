@@ -261,3 +261,34 @@ function updateRotations(n) {
 };
 
 updateRotations(numRotations);
+
+// Select the <input> rotation element and attaches a listener to when the input
+// value changes.  On input change, call "updateRotations" function with the new value.
+d3.select("#resolutionSlider").on("input", function() {
+  updateResolution(+Number(this.value));
+});
+
+function updateResolution(n) {
+
+  // adjust the text on the range slider
+  d3.select("#res-value").text(n);
+  d3.select("#updateResolution").property("value", n);
+
+  resolution = n;
+
+  // Generates new data points based on the input value
+  //var newData = d3.range(0, 12 * Math.PI, .01).map(inputDataGenerator(n, numRevolutions));
+
+  var newData = d3.range(0, numRotations * Math.PI, resolution).map(newDataGenerator(d, v, scale));
+
+
+  // Apply those new data points.  D3 will use the radial line function
+  // that we have previously defined above to map those values to Cartesian coordinates
+  // so we need to update the value of the d attribute on the <path> element
+  svg.selectAll(".line")
+    .datum(newData)
+    .attr("d", line)
+
+};
+
+updateResolution(resolution);
