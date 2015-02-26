@@ -257,6 +257,9 @@ function updateRotations(n) {
     .datum(newData)
     .attr("d", line)
 
+  d3.selectAll('.rangeSlider')
+    .attr("max", n)
+
 };
 
 updateRotations(numRotations);
