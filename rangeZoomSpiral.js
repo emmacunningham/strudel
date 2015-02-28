@@ -209,7 +209,15 @@ d3.select("#d").property("value", d);
 d3.select("#v-value").text(v);
 d3.select("#v").property("value", v);
 
-update(d,v);
+// Converts from degrees to radians.
+Math.radians = function(degrees) {
+  return degrees * Math.PI / 180;
+};
+
+// Converts from radians to degrees.
+Math.degrees = function(radians) {
+  return radians * 180 / Math.PI;
+};
 
 // Updates the spiral data per the value of the input range slider.
 function update(newD, newV) {
@@ -218,6 +226,8 @@ function update(newD, newV) {
   //var newData = d3.range(0, 12 * Math.PI, .01).map(inputDataGenerator(n, numRevolutions));
   d = newD;
   v = newV;
+
+
   var newData = d3.range(0, numRotations * Math.PI, resolution).map(newDataGenerator(newD, newV, scale));
 
 
@@ -228,7 +238,63 @@ function update(newD, newV) {
     .datum(newData)
     .attr("d", line)
 
+  // Getting closer...
+  var poop = d3.range(0, 12 * Math.PI, .5);
+  var poopData = poop.map(newDataGenerator(newD, newV, scale));
+  //console.log(poopData)
+
+  var test = [];
+  for (var i = 0, l = 1000; i < l; i++) {
+    test.push(newData[i]);
+  }
+
+  var polarToCarX = function(d) {
+    return r(d[1]) * Math.cos((Math.PI / 128 - d[0]));
+    //return r(d[0] * Math.cos(2 * Math.PI * (Math.PI / 2 - d[0])));
+  };
+
+  var polarToCarY = function(d) {
+    return r(d[1]) * Math.sin((Math.PI / 128 - d[0]));
+    //return r(d[0] * Math.sin(2 * Math.PI * (Math.PI / 2 - d[0])));
+  };
+
+  var circles = svg.selectAll("circle")
+      .data(poopData)
+      .enter()
+      .append("circle")
+      /*
+      .attr("cx", function (d) { return d[0]; })
+      .attr("cy", function (d) { return d[1]; })
+      */
+
+      .attr("cx", function (d) { return polarToCarX(d); })
+      .attr("cy", function (d) { return polarToCarY(d); })
+
+      .attr("r", 2);
+
+/*
+  var array = [0, 1, 2, 3, 800];
+  var dataset = array.map(newDataGenerator(newD, newV, scale));
+
+  svg.selectAll("circle")
+     .data(dataset)
+     .enter()
+     .append("circle")
+     .attr("cx", function(d) {
+              return d[0];
+         })
+         .attr("cy", function(d) {
+              return d[1];
+         })
+         .attr("r", 5);
+*/
+
+
+
 };
+
+update(d,v);
+
 
 // Select the <input> rotation element and attaches a listener to when the input
 // value changes.  On input change, call "updateRotations" function with the new value.
