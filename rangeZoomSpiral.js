@@ -13,6 +13,9 @@ var d = 1;
 // This was defined as a constant in paul's demo.  ????
 var b = 5/6;
 
+// Dummy data for data plotting
+var datapoints = d3.range(0, 12 * Math.PI, .5);
+
 // Returns absolute value for v and d.
 // Use for wherever 't' occurs in paul's demo
 // NOT TO BE CONFUSED WITH 't' for 'theta' here.
@@ -175,6 +178,39 @@ var svg = d3.select("body").append("svg")
 svg.append("path")
     .attr("class", "line")
 
+
+
+// Update data points on curve
+function updatePoints(range1, range2) {
+  // Getting closer...
+  var plotData = datapoints.map(newDataGenerator(range1, range2, scale));
+
+  // NB: not sure exactly why but we also had to apply the
+  // scaling function to the denominator of Math.PI in the representation
+  // of the angle (i.e. Math.PI / ___ - d[0]).  It fits the points along
+  // the curve correctly when we do that so?
+  var polarToCarX = function(d) {
+    return r(d[1]) * Math.cos((Math.PI / r(2) - d[0]));
+  };
+
+  var polarToCarY = function(d) {
+    return r(d[1]) * Math.sin((Math.PI / r(2) - d[0]));
+  };
+
+  var circle = svg.selectAll("circle")
+      .data(plotData);
+
+  circle.exit().remove();
+
+  circle.enter().append("circle")
+      .attr("r", 1.5);
+
+  circle
+      .attr("cx", function (d) { return polarToCarX(d); })
+      .attr("cy", function (d) { return polarToCarY(d); });
+};
+
+
 // Select the <input> range element and attaches a listener to when the input
 // value changes.  On input change, call "update" function with the new value.
 d3.selectAll(".rangeSlider").on("input", function() {
@@ -238,58 +274,8 @@ function update(newD, newV) {
     .datum(newData)
     .attr("d", line)
 
-  // Getting closer...
-  var poop = d3.range(0, 12 * Math.PI, .5);
-  var poopData = poop.map(newDataGenerator(newD, newV, scale));
-  //console.log(poopData)
 
-  var test = [];
-  for (var i = 0, l = 1000; i < l; i++) {
-    test.push(newData[i]);
-  }
-
-  var polarToCarX = function(d) {
-    return r(d[1]) * Math.cos((Math.PI / 128 - d[0]));
-    //return r(d[0] * Math.cos(2 * Math.PI * (Math.PI / 2 - d[0])));
-  };
-
-  var polarToCarY = function(d) {
-    return r(d[1]) * Math.sin((Math.PI / 128 - d[0]));
-    //return r(d[0] * Math.sin(2 * Math.PI * (Math.PI / 2 - d[0])));
-  };
-
-  var circles = svg.selectAll("circle")
-      .data(poopData)
-      .enter()
-      .append("circle")
-      /*
-      .attr("cx", function (d) { return d[0]; })
-      .attr("cy", function (d) { return d[1]; })
-      */
-
-      .attr("cx", function (d) { return polarToCarX(d); })
-      .attr("cy", function (d) { return polarToCarY(d); })
-
-      .attr("r", 2);
-
-/*
-  var array = [0, 1, 2, 3, 800];
-  var dataset = array.map(newDataGenerator(newD, newV, scale));
-
-  svg.selectAll("circle")
-     .data(dataset)
-     .enter()
-     .append("circle")
-     .attr("cx", function(d) {
-              return d[0];
-         })
-         .attr("cy", function(d) {
-              return d[1];
-         })
-         .attr("r", 5);
-*/
-
-
+  updatePoints(newD, newV);
 
 };
 
@@ -325,6 +311,8 @@ function updateRotations(n) {
 
   d3.selectAll('.rangeSlider')
     .attr("max", n)
+
+  updatePoints(d, v);
 
 };
 
