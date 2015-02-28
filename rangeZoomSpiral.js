@@ -14,7 +14,7 @@ var d = 1;
 var b = 5/6;
 
 // Dummy data for data plotting
-var datapoints = d3.range(0, 12 * Math.PI, .5);
+var datapoints = d3.range(0, 12 * Math.PI, .500);
 
 // Returns absolute value for v and d.
 // Use for wherever 't' occurs in paul's demo
@@ -137,7 +137,7 @@ var inputDataGenerator = function(p, rev) {
 
 // Init width, height of graph container and radius of graph.
 var width = 960,
-    height = 500,
+    height = 600,
     radius = Math.min(width, height) / 2 - 30;
 
 
@@ -244,16 +244,6 @@ d3.select("#d-value").text(d);
 d3.select("#d").property("value", d);
 d3.select("#v-value").text(v);
 d3.select("#v").property("value", v);
-
-// Converts from degrees to radians.
-Math.radians = function(degrees) {
-  return degrees * Math.PI / 180;
-};
-
-// Converts from radians to degrees.
-Math.degrees = function(radians) {
-  return radians * 180 / Math.PI;
-};
 
 // Updates the spiral data per the value of the input range slider.
 function update(newD, newV) {
