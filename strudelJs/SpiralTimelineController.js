@@ -15,8 +15,8 @@ strudel.SpiralTimelineController = function() {
 
   // v and d are the range of the zoom.  We will make these user manipulable
   // when everything else works like gravy.
-  this.v = 0;
-  this.d = 1;
+  this.zoomRangeStart = 0;
+  this.zoomRangeEnd = 1;
 
 
   // Math Utils helper
@@ -27,7 +27,6 @@ strudel.SpiralTimelineController = function() {
   this.height = 600;
   this.radius = Math.min(this.width, this.height) / 2 - 30;
 
-
   // Generates function constraining domain and range of graph
   // From what I can tell manipulating the domain values, it seems to just
   // hange the scaling of the graph within the viewport.
@@ -35,6 +34,8 @@ strudel.SpiralTimelineController = function() {
       .domain([0, 6])
       .range([0, this.radius]);
 
+  // For now, dummy data.  When we work with real data we'll want to
+  // provide a method that allows you to import JSON or somethin.
   this.datapoints = d3.range(0, 12 * Math.PI, .500);
 
   // Generates function which will apply a transformation to the data points
@@ -75,16 +76,13 @@ strudel.SpiralTimelineController = function() {
 };
 
 // Updates the spiral data per the value of the input range slider.
-strudel.SpiralTimelineController.prototype.update = function(newD, newV) {
+strudel.SpiralTimelineController.prototype.update = function(zoomRangeStart, zoomRangeEnd) {
 
   // Generates new data points based on the input value
-  //var newData = d3.range(0, 12 * Math.PI, .01).map(inputDataGenerator(n, numRevolutions));
-  this.d = newD;
-  this.v = newV;
+  this.zoomRangeStart = zoomRangeStart;
+  this.zoomRangeEnd = zoomRangeEnd;
 
-
-  var newData = d3.range(0, this.numRotations * Math.PI, this.resolution).map(this.newDataGenerator(newD, newV, this.scale));
-
+  var newData = d3.range(0, this.numRotations * Math.PI, this.resolution).map(this.newDataGenerator(zoomRangeStart, zoomRangeEnd, this.scale));
 
   // Apply those new data points.  D3 will use the radial line function
   // that we have previously defined above to map those values to Cartesian coordinates
@@ -93,8 +91,7 @@ strudel.SpiralTimelineController.prototype.update = function(newD, newV) {
     .datum(newData)
     .attr("d", this.line)
 
-
-  this.updatePoints(newD, newV);
+  this.updatePoints(zoomRangeStart, zoomRangeEnd);
 
 };
 
@@ -106,10 +103,7 @@ strudel.SpiralTimelineController.prototype.updateRotations = function(n) {
 
   this.numRotations = n;
 
-  // Generates new data points based on the input value
-  //var newData = d3.range(0, 12 * Math.PI, .01).map(inputDataGenerator(n, numRevolutions));
-
-  var newData = d3.range(0, n * Math.PI, this.resolution).map(this.newDataGenerator(this.d, this.v, this.scale));
+  var newData = d3.range(0, n * Math.PI, this.resolution).map(this.newDataGenerator(this.zoomRangeStart, this.zoomRangeEnd, this.scale));
 
 
   // Apply those new data points.  D3 will use the radial line function
@@ -122,7 +116,7 @@ strudel.SpiralTimelineController.prototype.updateRotations = function(n) {
   d3.selectAll('.rangeSlider')
     .attr("max", n)
 
-  this.updatePoints(this.d, this.v);
+  this.updatePoints(this.zoomRangeStart, this.zoomRangeEnd);
 
 };
 
@@ -137,7 +131,7 @@ strudel.SpiralTimelineController.prototype.updateResolution = function(n) {
   // Generates new data points based on the input value
   //var newData = d3.range(0, 12 * Math.PI, .01).map(inputDataGenerator(n, numRevolutions));
 
-  var newData = d3.range(0, this.numRotations * Math.PI, this.resolution).map(this.newDataGenerator(this.d, this.v, this.scale));
+  var newData = d3.range(0, this.numRotations * Math.PI, this.resolution).map(this.newDataGenerator(this.zoomRangeStart, this.zoomRangeEnd, this.scale));
 
 
   // Apply those new data points.  D3 will use the radial line function
@@ -190,12 +184,12 @@ strudel.SpiralTimelineController.prototype.initColorPicker = function() {
 // Initial starting value of input sliders.
 strudel.SpiralTimelineController.prototype.initSliders = function() {
 
-  d3.select("#d-value").text(this.d);
-  d3.select("#d").property("value", this.d);
-  d3.select("#v-value").text(this.v);
-  d3.select("#v").property("value", this.v);
+  d3.select("#d-value").text(this.zoomRangeStart);
+  d3.select("#d").property("value", this.zoomRangeStart);
+  d3.select("#v-value").text(this.zoomRangeEnd);
+  d3.select("#v").property("value", this.zoomRangeEnd);
 
-  this.update(this.d, this.v);
+  this.update(this.zoomRangeStart, this.zoomRangeEnd);
   this.updateRotations(this.numRotations);
   this.updateResolution(this.resolution);
   this.updatePathWeight(this.pathWeight);
@@ -211,23 +205,23 @@ strudel.SpiralTimelineController.prototype.addSliderListeners = function() {
   d3.selectAll(".rangeSlider").on("input", function() {
     var id = this.id;
 
-    var d = d3.select("#d")[0][0].value;
-    var v = d3.select("#v")[0][0].value;
+    var zoomRangeStart = d3.select("#d")[0][0].value;
+    var zoomRangeEnd = d3.select("#v")[0][0].value;
 
     // There's surely a better way to do this but saving that for a refactor
     switch (id) {
       case 'd':
-        d3.select("#d-value").text(d);
-        d3.select("#d").property("value", d);
+        d3.select("#d-value").text(zoomRangeStart);
+        d3.select("#d").property("value", zoomRangeStart);
         break;
       case 'v':
-        d3.select("#v-value").text(v);
-        d3.select("#v").property("value", v);
+        d3.select("#v-value").text(zoomRangeEnd);
+        d3.select("#v").property("value", zoomRangeEnd);
         break;
     }
 
 
-    self.update(Number(d), Number(v));
+    self.update(Number(zoomRangeStart), Number(zoomRangeEnd));
 
   });
 
@@ -253,12 +247,12 @@ strudel.SpiralTimelineController.prototype.addSliderListeners = function() {
 
 };
 
-strudel.SpiralTimelineController.prototype.newHotness = function(theta, d, v, l) {
-  var z = this.utils.getZ(d, v, l);
-  var p = this.utils.getP(z, d, v);
-  var w = this.utils.getW(d, v);
+strudel.SpiralTimelineController.prototype.newHotness = function(theta, zoomRangeStart, zoomRangeEnd, l) {
+  var z = this.utils.getZ(zoomRangeStart, zoomRangeEnd, l);
+  var p = this.utils.getP(z, zoomRangeStart, zoomRangeEnd);
+  var w = this.utils.getW(zoomRangeStart, zoomRangeEnd);
   var bigP = this.utils.getBigP(p, l, w);
-  var o = this.utils.getO(d, v);
+  var o = this.utils.getO(zoomRangeStart, zoomRangeEnd);
 
   var c = this.utils.getC(o, w, l, bigP);
 
@@ -279,11 +273,11 @@ strudel.SpiralTimelineController.prototype.newHotness = function(theta, d, v, l)
 
 };
 
-strudel.SpiralTimelineController.prototype.newDataGenerator = function(d, v, l) {
+strudel.SpiralTimelineController.prototype.newDataGenerator = function(zoomRangeStart, zoomRangeEnd, l) {
   var self = this;
 
   var spiralDataGenerator = function(theta) {
-    return [theta, self.newHotness(theta, d, v, l)];
+    return [theta, self.newHotness(theta, zoomRangeStart, zoomRangeEnd, l)];
   };
 
   return spiralDataGenerator;
@@ -295,11 +289,11 @@ strudel.SpiralTimelineController.prototype.spiralF = function(theta, p, r) {
 };
 
 // Update data points on curve
-strudel.SpiralTimelineController.prototype.updatePoints = function (range1, range2) {
+strudel.SpiralTimelineController.prototype.updatePoints = function (zoomRangeStart, zoomRangeEnd) {
   var self = this;
 
   // Getting closer...
-  var plotData = this.datapoints.map(this.newDataGenerator(range1, range2, this.scale));
+  var plotData = this.datapoints.map(this.newDataGenerator(zoomRangeStart, zoomRangeEnd, this.scale));
 
   // NB: not sure exactly why but we also had to apply the
   // scaling function to the denominator of Math.PI in the representation
