@@ -190,11 +190,11 @@ function updatePoints(range1, range2) {
   // of the angle (i.e. Math.PI / ___ - d[0]).  It fits the points along
   // the curve correctly when we do that so?
   var polarToCarX = function(d) {
-    return r(d[1]) * Math.cos((Math.PI / r(2) - d[0]));
+    return r(d[1]) * Math.cos(-d[0]);
   };
 
   var polarToCarY = function(d) {
-    return r(d[1]) * Math.sin((Math.PI / r(2) - d[0]));
+    return r(d[1]) * Math.sin(-d[0]);
   };
 
   var circle = svg.selectAll("circle")

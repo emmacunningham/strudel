@@ -68,10 +68,10 @@ strudel.SpiralTimelineController = function() {
   this.svg.append("path")
       .attr("class", "line");
 
-  this.addRangeSliderListeners();
+  this.addSliderListeners();
 
-  this.initRangeSliders();
-
+  this.initSliders();
+  this.initColorPicker();
 };
 
 // Updates the spiral data per the value of the input range slider.
@@ -98,9 +98,97 @@ strudel.SpiralTimelineController.prototype.update = function(newD, newV) {
 
 };
 
+strudel.SpiralTimelineController.prototype.updateRotations = function(n) {
 
-// Initial starting value of input range sliders.
-strudel.SpiralTimelineController.prototype.initRangeSliders = function() {
+  // adjust the text on the range slider
+  d3.select("#r-value").text(n);
+  d3.select("#rotationSlider").property("value", n);
+
+  this.numRotations = n;
+
+  // Generates new data points based on the input value
+  //var newData = d3.range(0, 12 * Math.PI, .01).map(inputDataGenerator(n, numRevolutions));
+
+  var newData = d3.range(0, n * Math.PI, this.resolution).map(this.newDataGenerator(this.d, this.v, this.scale));
+
+
+  // Apply those new data points.  D3 will use the radial line function
+  // that we have previously defined above to map those values to Cartesian coordinates
+  // so we need to update the value of the d attribute on the <path> element
+  this.svg.selectAll(".line")
+    .datum(newData)
+    .attr("d", this.line)
+
+  d3.selectAll('.rangeSlider')
+    .attr("max", n)
+
+  this.updatePoints(this.d, this.v);
+
+};
+
+strudel.SpiralTimelineController.prototype.updateResolution = function(n) {
+
+  // adjust the text on the range slider
+  d3.select("#res-value").text(n);
+  d3.select("#resolutionSlider").property("value", n);
+
+  this.resolution = n;
+
+  // Generates new data points based on the input value
+  //var newData = d3.range(0, 12 * Math.PI, .01).map(inputDataGenerator(n, numRevolutions));
+
+  var newData = d3.range(0, this.numRotations * Math.PI, this.resolution).map(this.newDataGenerator(this.d, this.v, this.scale));
+
+
+  // Apply those new data points.  D3 will use the radial line function
+  // that we have previously defined above to map those values to Cartesian coordinates
+  // so we need to update the value of the d attribute on the <path> element
+  this.svg.selectAll(".line")
+    .datum(newData)
+    .attr("d", this.line);
+
+};
+
+strudel.SpiralTimelineController.prototype.updatePathWeight = function(n) {
+
+  // adjust the text on the range slider
+  d3.select("#path-weight-value").text(n);
+  d3.select("#path-weight").property("value", n);
+
+  this.pathWeight = n;
+
+
+  // Apply those new data points.  D3 will use the radial line function
+  // that we have previously defined above to map those values to Cartesian coordinates
+  // so we need to update the value of the d attribute on the <path> element
+  this.svg.selectAll(".line")
+    .style('stroke-width', this.pathWeight + 'px');
+
+};
+
+// Color picker
+strudel.SpiralTimelineController.prototype.updateColor = function(hsb,hex,rgb,el,bySetColor) {
+  var hexStr = '#' + hex;
+  this.svg.selectAll(".line")
+    .style('stroke', hexStr);
+
+};
+
+
+strudel.SpiralTimelineController.prototype.initColorPicker = function() {
+  var self = this;
+  $('#color-picker').colpick({
+    flat:true,
+    layout:'hex',
+    submit:0,
+    onChange: self.updateColor,
+    color: '#ff0000'
+  });
+};
+
+
+// Initial starting value of input sliders.
+strudel.SpiralTimelineController.prototype.initSliders = function() {
 
   d3.select("#d-value").text(this.d);
   d3.select("#d").property("value", this.d);
@@ -108,11 +196,18 @@ strudel.SpiralTimelineController.prototype.initRangeSliders = function() {
   d3.select("#v").property("value", this.v);
 
   this.update(this.d, this.v);
+  this.updateRotations(this.numRotations);
+  this.updateResolution(this.resolution);
+  this.updatePathWeight(this.pathWeight);
+
 };
 
-strudel.SpiralTimelineController.prototype.addRangeSliderListeners = function() {
+strudel.SpiralTimelineController.prototype.addSliderListeners = function() {
   var self = this;
 
+
+  // Select the <input> range element and attaches a listener to when the input
+  // value changes.  On input change, call "update" function with the new value.
   d3.selectAll(".rangeSlider").on("input", function() {
     var id = this.id;
 
@@ -134,6 +229,26 @@ strudel.SpiralTimelineController.prototype.addRangeSliderListeners = function() 
 
     self.update(Number(d), Number(v));
 
+  });
+
+
+  // Select the <input> rotation element and attaches a listener to when the input
+  // value changes.  On input change, call "updateRotations" function with the new value.
+  d3.select("#rotationSlider").on("input", function() {
+    self.updateRotations(+Number(this.value));
+  });
+
+  // Select the <input> rotation element and attaches a listener to when the input
+  // value changes.  On input change, call "updateResolution" function with the new value.
+  d3.select("#resolutionSlider").on("input", function() {
+    self.updateResolution(+Number(this.value));
+  });
+
+
+  // Select the <input> rotation element and attaches a listener to when the input
+  // value changes.  On input change, call "updatePathWeight" function with the new value.
+  d3.select("#path-weight").on("input", function() {
+    self.updatePathWeight(+Number(this.value));
   });
 
 };
@@ -191,11 +306,11 @@ strudel.SpiralTimelineController.prototype.updatePoints = function (range1, rang
   // of the angle (i.e. Math.PI / ___ - d[0]).  It fits the points along
   // the curve correctly when we do that so?
   var polarToCarX = function(d) {
-    return self.r(d[1]) * Math.cos((Math.PI / self.r(2) - d[0]));
+    return self.r(d[1]) * Math.cos(-d[0]);
   };
 
   var polarToCarY = function(d) {
-    return self.r(d[1]) * Math.sin((Math.PI / self.r(2) - d[0]));
+    return self.r(d[1]) * Math.sin(-d[0]);
   };
 
   var circle = this.svg.selectAll("circle")
