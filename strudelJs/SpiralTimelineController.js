@@ -310,12 +310,27 @@ strudel.SpiralTimelineController.prototype.updatePoints = function (zoomRangeSta
   var circle = this.svg.selectAll("circle")
       .data(plotData);
 
+
+  var sizes = [];
   circle.exit().remove();
 
+
+
   circle.enter().append("circle")
-      .attr("r", 1.5);
+    .attr('r', function(d) {
+      for (var i = 0, l = plotData.length; i < l; i++) {
+        var size = (i * .25) + d[1];
+        return size;
+      }
+     })
 
   circle
       .attr("cx", function (d) { return polarToCarX(d); })
       .attr("cy", function (d) { return polarToCarY(d); });
+  for (var i = 0, l = plotData.length; i < l; i++) {
+    var size = (i * .25) + 1;
+    sizes.push(size);
+  }
+
+
 };

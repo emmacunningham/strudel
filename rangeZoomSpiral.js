@@ -203,7 +203,13 @@ function updatePoints(range1, range2) {
   circle.exit().remove();
 
   circle.enter().append("circle")
-      .attr("r", 1.5);
+    .attr('r', function(d) {
+      for (var i = 0, l = plotData.length; i < l; i++) {
+        var size = (i * .25) + d[1];
+        return size;
+      }
+     })
+
 
   circle
       .attr("cx", function (d) { return polarToCarX(d); })
@@ -254,7 +260,7 @@ function update(newD, newV) {
   v = newV;
 
 
-  var newData = d3.range(0, numRotations * Math.PI, resolution).map(newDataGenerator(newD, newV, scale));
+  var newData = d3.range(0, numRotations * 2 * Math.PI, resolution).map(newDataGenerator(newD, newV, scale));
 
 
   // Apply those new data points.  D3 will use the radial line function
@@ -289,7 +295,7 @@ function updateRotations(n) {
   // Generates new data points based on the input value
   //var newData = d3.range(0, 12 * Math.PI, .01).map(inputDataGenerator(n, numRevolutions));
 
-  var newData = d3.range(0, n * Math.PI, resolution).map(newDataGenerator(d, v, scale));
+  var newData = d3.range(0, n * 2 * Math.PI, resolution).map(newDataGenerator(d, v, scale));
 
 
   // Apply those new data points.  D3 will use the radial line function
@@ -300,7 +306,7 @@ function updateRotations(n) {
     .attr("d", line)
 
   d3.selectAll('.rangeSlider')
-    .attr("max", n)
+    .attr("max", n / 2)
 
   updatePoints(d, v);
 
@@ -325,7 +331,7 @@ function updateResolution(n) {
   // Generates new data points based on the input value
   //var newData = d3.range(0, 12 * Math.PI, .01).map(inputDataGenerator(n, numRevolutions));
 
-  var newData = d3.range(0, numRotations * Math.PI, resolution).map(newDataGenerator(d, v, scale));
+  var newData = d3.range(0, numRotations * 2 * Math.PI, resolution).map(newDataGenerator(d, v, scale));
 
 
   // Apply those new data points.  D3 will use the radial line function
