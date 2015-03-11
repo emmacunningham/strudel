@@ -1,7 +1,10 @@
 'use strict';
 var strudel = strudel || {};
 
-strudel.SpiralTimelineController = function() {
+
+
+
+strudel.SpiralTimelineController = function(params) {
 
   // Number of rotations around the origin
   this.numRotations = 12;
@@ -9,9 +12,6 @@ strudel.SpiralTimelineController = function() {
   // Resolution of the datapoints drawn on curve
   this.resolution = .01;
   this.pathWeight = 1;
-
-  // Controls how much the graph is scaled for the viewport
-  this.scale = 6;
 
   // v and d are the range of the zoom.  We will make these user manipulable
   // when everything else works like gravy.
@@ -31,7 +31,7 @@ strudel.SpiralTimelineController = function() {
   // From what I can tell manipulating the domain values, it seems to just
   // hange the scaling of the graph within the viewport.
   this.r = d3.scale.linear()
-      .domain([0, 6])
+      .domain([0, this.numRotations])
       .range([0, this.radius]);
 
   // For now, dummy data.  When we work with real data we'll want to
@@ -82,7 +82,7 @@ strudel.SpiralTimelineController.prototype.update = function(zoomRangeStart, zoo
   this.zoomRangeStart = zoomRangeStart;
   this.zoomRangeEnd = zoomRangeEnd;
 
-  var newData = d3.range(0, this.numRotations * Math.PI, this.resolution).map(this.newDataGenerator(zoomRangeStart, zoomRangeEnd, this.scale));
+  var newData = d3.range(0, this.numRotations * 2 * Math.PI, this.resolution).map(this.newDataGenerator(this.zoomRangeEnd , this.zoomRangeStart, this.numRotations));
 
   // Apply those new data points.  D3 will use the radial line function
   // that we have previously defined above to map those values to Cartesian coordinates
@@ -91,7 +91,7 @@ strudel.SpiralTimelineController.prototype.update = function(zoomRangeStart, zoo
     .datum(newData)
     .attr("d", this.line)
 
-  this.updatePoints(zoomRangeStart, zoomRangeEnd);
+  //this.updatePoints(zoomRangeStart, zoomRangeEnd);
 
 };
 
@@ -103,7 +103,11 @@ strudel.SpiralTimelineController.prototype.updateRotations = function(n) {
 
   this.numRotations = n;
 
-  var newData = d3.range(0, n * Math.PI, this.resolution).map(this.newDataGenerator(this.zoomRangeStart, this.zoomRangeEnd, this.scale));
+  this.r = d3.scale.linear()
+      .domain([0, this.numRotations])
+      .range([0, this.radius]);
+
+  var newData = d3.range(0, this.numRotations * 2 * Math.PI, this.resolution).map(this.newDataGenerator(this.zoomRangeStart, this.zoomRangeEnd, this.numRotations));
 
 
   // Apply those new data points.  D3 will use the radial line function
@@ -131,7 +135,7 @@ strudel.SpiralTimelineController.prototype.updateResolution = function(n) {
   // Generates new data points based on the input value
   //var newData = d3.range(0, 12 * Math.PI, .01).map(inputDataGenerator(n, numRevolutions));
 
-  var newData = d3.range(0, this.numRotations * Math.PI, this.resolution).map(this.newDataGenerator(this.zoomRangeStart, this.zoomRangeEnd, this.scale));
+  var newData = d3.range(0, this.numRotations * 2 * Math.PI, this.resolution).map(this.newDataGenerator(this.zoomRangeStart, this.zoomRangeEnd, this.numRotations));
 
 
   // Apply those new data points.  D3 will use the radial line function
@@ -293,7 +297,7 @@ strudel.SpiralTimelineController.prototype.updatePoints = function (zoomRangeSta
   var self = this;
 
   // Getting closer...
-  var plotData = this.datapoints.map(this.newDataGenerator(zoomRangeStart, zoomRangeEnd, this.scale));
+  var plotData = this.datapoints.map(this.newDataGenerator(zoomRangeStart, zoomRangeEnd, this.numRotations));
 
   // NB: not sure exactly why but we also had to apply the
   // scaling function to the denominator of Math.PI in the representation
@@ -314,23 +318,18 @@ strudel.SpiralTimelineController.prototype.updatePoints = function (zoomRangeSta
   var sizes = [];
   circle.exit().remove();
 
-
-
   circle.enter().append("circle")
     .attr('r', function(d) {
-      for (var i = 0, l = plotData.length; i < l; i++) {
-        var size = (i * .25) + d[1];
+        var size = Math.sqrt(d[1]);
+
         return size;
-      }
+
      })
 
   circle
       .attr("cx", function (d) { return polarToCarX(d); })
       .attr("cy", function (d) { return polarToCarY(d); });
-  for (var i = 0, l = plotData.length; i < l; i++) {
-    var size = (i * .25) + 1;
-    sizes.push(size);
-  }
+
 
 
 };
