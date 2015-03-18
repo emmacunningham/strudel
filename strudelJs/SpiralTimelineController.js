@@ -272,6 +272,8 @@ strudel.SpiralTimelineController.prototype.initSliders = function() {
 
   this.updatePath();
 
+  this.zoomRangeSlider = new strudel.ui.ZoomRangeSlider();
+
 };
 
 /**
