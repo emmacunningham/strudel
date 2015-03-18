@@ -85,7 +85,7 @@ strudel.SpiralTimelineController = function(params) {
    */
   this.datapoints = [];
   // Uncomment below to show circles.
-  this.datapoints = d3.range(0, 12 * Math.PI, .500);
+  // this.datapoints = d3.range(0, 12 * Math.PI, .500);
 
   // Store 'this' object in variable name that won't get overwritten within
   // the scope of another function.
