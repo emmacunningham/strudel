@@ -45,10 +45,13 @@ strudel.ui.ZoomRangeSlider = function(max, start, end) {
 
   // Optional addon: creating Pips (Percentage In Point);
   $('#range').noUiSlider_pips({
-    mode: 'count',
-    values: 6,
-    density: 4
-  });
+      mode: 'positions',
+      values: [0,25,50,75,100],
+      density: 4,
+      format: wNumb({
+        decimals: 2,
+      })
+    });
 
   this.element = $("#range");
 
@@ -72,9 +75,12 @@ strudel.ui.ZoomRangeSlider.prototype.updateValues = function(max, start, end) {
 
   // Optional addon: creating Pips (Percentage In Point);
   $('#range').noUiSlider_pips({
-    mode: 'count',
-    values: 6,
-    density: 4
+      mode: 'positions',
+      values: [0,25,50,75,100],
+      density: 4,
+      format: wNumb({
+        decimals: 2,
+      })
   });
 
 };

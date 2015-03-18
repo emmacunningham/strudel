@@ -24,7 +24,7 @@ strudel.SpiralTimelineController = function(params) {
    * Number of rotations around the origin.
    * @type {Number}
    */
-  this.numRotations = 12;
+  this.numRotations = 6;
 
   /**
    * Resolution of the datapoints drawn on curve.
@@ -42,13 +42,13 @@ strudel.SpiralTimelineController = function(params) {
    * Start of range to zoom over.
    * @type {Number}
    */
-  this.zoomRangeStart = 0;
+  this.zoomRangeStart = 2;
 
   /**
    * End of range to zoom over.
    * @type {Number}
    */
-  this.zoomRangeEnd = 1;
+  this.zoomRangeEnd = 4;
 
   /**
    * Math helpers.
@@ -320,19 +320,19 @@ strudel.SpiralTimelineController.prototype.addSliderListeners = function() {
     slide: function(){
       var zoomRangeStart = $("#range").val()[0];
       var zoomRangeEnd = $("#range").val()[1];
-
+      console.log($("#range").val());
       self.updateZoomRange(Number(zoomRangeStart), Number(zoomRangeEnd));
     },
     set: function(){
       var zoomRangeStart = $("#range").val()[0];
       var zoomRangeEnd = $("#range").val()[1];
-
+      console.log($("#range").val());
       self.updateZoomRange(Number(zoomRangeStart), Number(zoomRangeEnd));
     },
     change: function(){
       var zoomRangeStart = $("#range").val()[0];
       var zoomRangeEnd = $("#range").val()[1];
-
+      console.log($("#range").val());
       self.updateZoomRange(Number(zoomRangeStart), Number(zoomRangeEnd));
     }
   });
