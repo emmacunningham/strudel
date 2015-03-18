@@ -1,9 +1,6 @@
 'use strict';
 var strudel = strudel || {};
 
-
-
-
 strudel.SpiralTimelineController = function(params) {
 
   // Number of rotations around the origin
@@ -91,7 +88,7 @@ strudel.SpiralTimelineController.prototype.update = function(zoomRangeStart, zoo
     .datum(newData)
     .attr("d", this.line)
 
-  //this.updatePoints(zoomRangeStart, zoomRangeEnd);
+  this.updatePoints(zoomRangeStart, zoomRangeEnd);
 
 };
 
@@ -251,29 +248,14 @@ strudel.SpiralTimelineController.prototype.addSliderListeners = function() {
 
 };
 
-strudel.SpiralTimelineController.prototype.newHotness = function(theta, zoomRangeStart, zoomRangeEnd, l) {
-  var z = this.utils.getZ(zoomRangeStart, zoomRangeEnd, l);
-  var p = this.utils.getP(z, zoomRangeStart, zoomRangeEnd);
-  var w = this.utils.getW(zoomRangeStart, zoomRangeEnd);
+strudel.SpiralTimelineController.prototype.newHotness = function(theta, d, v, l) {
+  var z = this.utils.getZ(d, v, l);
+  var p = this.utils.getP(z, d, v);
+  var w = this.utils.getW(d, v);
   var bigP = this.utils.getBigP(p, l, w);
-  var o = this.utils.getO(zoomRangeStart, zoomRangeEnd);
-
+  var o = this.utils.getO(d, v);
   var c = this.utils.getC(o, w, l, bigP);
-
-
-  var origData = this.spiralF(theta, p, l);
-
-  var thetaOver2PiMinusC =
-    (theta / 2*Math.PI) - c;
-
-  var newTopPartOne = Math.exp(thetaOver2PiMinusC / o);
-  var newTopPartTwo = Math.exp(p * (l - (theta / 2*Math.PI)));
-  var newTop = newTopPartOne + newTopPartTwo;
-  var newBottom = Math.exp(thetaOver2PiMinusC / o) + 1;
-  var newStuff = newTop / newBottom;
-  var result = newStuff * origData;
-
-  return result;
+  return (Math.exp(((theta / (2*Math.PI)) - c) / o) + Math.exp(p * (l - (theta / (2*Math.PI)))))/(Math.exp(((theta / (2*Math.PI)) - c) / o) + 1) * l*(Math.exp((theta*p)/(2*Math.PI))-1)/(Math.exp(p*l)-1);
 
 };
 
@@ -318,6 +300,7 @@ strudel.SpiralTimelineController.prototype.updatePoints = function (zoomRangeSta
   var sizes = [];
   circle.exit().remove();
 
+  /*
   circle.enter().append("circle")
     .attr('r', function(d) {
         var size = Math.sqrt(d[1]);
@@ -329,7 +312,7 @@ strudel.SpiralTimelineController.prototype.updatePoints = function (zoomRangeSta
   circle
       .attr("cx", function (d) { return polarToCarX(d); })
       .attr("cy", function (d) { return polarToCarY(d); });
-
+  */
 
 
 };
