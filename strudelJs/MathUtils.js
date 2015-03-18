@@ -115,7 +115,7 @@ strudel.MathUtils.prototype.getBigP = function(p, l, w) {
  * @param {Number} l - number of rotations.
  * @return {Number} - radius value.
  */
-strudel.MathUtils.prototype.newHotness = function(theta, d, v, l) {
+strudel.MathUtils.prototype.getRadius = function(theta, d, v, l) {
   var z = this.getZ(d, v, l);
   var p = this.getP(z, d, v);
   var w = this.getW(d, v);
