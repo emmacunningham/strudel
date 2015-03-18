@@ -1,51 +1,88 @@
+/**
+ * @fileoverview Class for utility math operations.
+ */
+
 'use strict';
 var strudel = strudel || {};
 
+
+/**
+ * Constructor for MathUtils.
+ * @constructor
+ */
 strudel.MathUtils = function() {
-  // This was defined as a constant in paul's demo.  ????
+  /**
+   * Constant value which controls the focus of zoomability.
+   * @type {Number}
+   */
   this.b = 5/6;
 };
 
-// Returns absolute value for v and d.
-// Use for wherever 't' occurs in paul's demo
-// NOT TO BE CONFUSED WITH 't' for 'theta' here.
+
+/**
+ * Use for wherever 't' occurs in paul's demo
+ * @param {Number} d - zoom range point.
+ * @param {Number} v - zoom range point.
+ * @return {Number} - absolute value for v and d.
+ */
 strudel.MathUtils.prototype.getT = function(d, v) {
   return Math.abs(d - v);
 };
 
-// Returns the value that controls the zoom variable, based on zoom range.
-// Use for wherever 'p' occurs in paul's demo
-strudel.MathUtils.prototype.getP = function(z, d, v) {
-  var top = Math.log(1 - z);
-  var bottom = this.getT(d, v);
 
-  return top / bottom;
+/**
+ * Use for wherever 'p' occurs in paul's demo
+ * @param {Number} z - ?.
+ * @param {Number} d - zoom range point.
+ * @param {Number} v - zoom range point.
+ * @return {Number} - the value that controls the zoom variable, based on zoom range.
+ */
+strudel.MathUtils.prototype.getP = function(z, d, v) {
+  return Math.log(1 - z) / this.getT(d, v);
 };
 
-// Corresponds to the z function in paul's demo.
-// We feed it into the arg that corresponds to z above when we use it.
+
+/**
+ * Corresponds to the z function in paul's demo.
+ * @param {Number} d - zoom range point.
+ * @param {Number} v - zoom range point.
+ * @param {Number} l - number of rotations.
+ * @return {Number} - z?
+ */
 strudel.MathUtils.prototype.getZ = function(d, v, l) {
-  //var l = numRevolutions;
   var t = this.getT(d, v);
   return this.b * (1 - (t/l));
 };
 
-// Corresponds to the o function in paul's demo.
+/**
+ * Corresponds to the o function in paul's demo.
+ * @param {Number} d - zoom range point.
+ * @param {Number} v - zoom range point.
+ * @return {Number} - o?
+ */
 strudel.MathUtils.prototype.getO = function(d, v) {
-  var t = this.getT(d, v);
-  var bottom = 2 * Math.log(5);
-  return t / bottom;
+  return this.getT(d, v) / 2 * Math.log(5);
 };
 
-// Corresponds to 'w' function in paul's demo.
-// Used in Paul's 'c'.
+/**
+ * Corresponds to the w function in paul's demo.
+ * @param {Number} d - zoom range point.
+ * @param {Number} v - zoom range point.
+ * @return {Number} - halfway point between zoom points d and v.
+ */
 strudel.MathUtils.prototype.getW = function(d, v) {
   return (d + v) / 2;
 };
 
-// Corresponds to 'c' function in paul's demo.
+/**
+ * Corresponds to the c function in paul's demo.
+ * @param {Number} o - ?.
+ * @param {Number} w - halfway point between zoom points d and v.
+ * @param {Number} l - number of rotations.
+ * @param {Number} bigP - bigP value.
+ * @return {Number} - c?
+ */
 strudel.MathUtils.prototype.getC = function(o, w, l, bigP) {
-  //var l = numRevolutions;
   if (bigP >= 0) {
     return w - (o * Math.log(bigP));
   }
@@ -56,13 +93,36 @@ strudel.MathUtils.prototype.getC = function(o, w, l, bigP) {
 
 };
 
+/**
+ * Corresponds to the P function in paul's demo.
+ * @param {Number} p - zoom variable, derived from range of zoom.
+ * @param {Number} l - number of rotations.
+ * @param {Number} w - halfway point between zoom points d and v.
+ * @return {Number} - bigP?
+ */
 strudel.MathUtils.prototype.getBigP = function(p, l, w) {
-  var topPartOne = (2 * Math.exp(p * (l - w)));
-  var topPartTwo = Math.exp(l * p);
-  var top = topPartOne - topPartTwo - 1;
-  var bottomPartOne = 2 * Math.exp(w * p);
-  var bottomPartTwo = Math.exp(l * p);
-  var bottom = bottomPartOne - bottomPartTwo - 1;
-
-  return top / bottom;
+  return (2 * Math.exp(p * (l - w))) - Math.exp(l * p) - 1 /
+         (2 * Math.exp(w * p) - Math.exp(l * p) - 1);
 };
+
+
+/**
+ * Determines radius value for a given theta, zoom range,
+ * and number of rotations.
+ * @param {Number} theta - theta coordinate.
+ * @param {Number} d - zoom range point.
+ * @param {Number} v - zoom range point.
+ * @param {Number} l - number of rotations.
+ * @return {Number} - radius value.
+ */
+strudel.MathUtils.prototype.newHotness = function(theta, d, v, l) {
+  var z = this.getZ(d, v, l);
+  var p = this.getP(z, d, v);
+  var w = this.getW(d, v);
+  var bigP = this.getBigP(p, l, w);
+  var o = this.getO(d, v);
+  var c = this.getC(o, w, l, bigP);
+  return (Math.exp(((theta / (2*Math.PI)) - c) / o) + Math.exp(p * (l - (theta / (2*Math.PI)))))/(Math.exp(((theta / (2*Math.PI)) - c) / o) + 1) * l*(Math.exp((theta*p)/(2*Math.PI))-1)/(Math.exp(p*l)-1);
+
+};
+
