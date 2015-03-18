@@ -14,6 +14,11 @@ var strudel = strudel || {};
  * @constructor
  */
 strudel.SpiralTimelineController = function(params) {
+  /**
+   * Whether the graph should be contained within the viewport.
+   * @type {Boolean}
+   */
+  this.containWithinViewport = true;
 
   /**
    * Number of rotations around the origin.
@@ -178,12 +183,11 @@ strudel.SpiralTimelineController.prototype.updateRotations = function(n) {
   this.numRotations = n;
 
   // Update scale of graph to fit within viewport.
-  // TODO: throw this into a conditional statement so we can
-  // toggle it on/off.
-  this.graphScale = d3.scale.linear()
-      .domain([0, this.numRotations])
-      .range([0, this.radius]);
-
+  if (this.containWithinViewport == true) {
+    this.graphScale = d3.scale.linear()
+        .domain([0, this.numRotations])
+        .range([0, this.radius]);
+  }
   // Sets the max value on range slider based on updated rotations value.
   // TODO: throw this into its own method so that when we update the
   // slider UI, we can update how this works too.
