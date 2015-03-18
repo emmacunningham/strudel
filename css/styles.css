@@ -1,3 +1,9 @@
+/* Range slider styles */
+#range {
+  margin: 60px auto;
+  width: 90%;
+}
+
 /* Graph styles */
 .frame {
   fill: none;

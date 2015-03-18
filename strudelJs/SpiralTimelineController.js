@@ -129,8 +129,8 @@ strudel.SpiralTimelineController = function(params) {
 
 
   // We may wish to throw all of this into an init method.
-  this.addSliderListeners();
   this.initSliders();
+  this.addSliderListeners();
   this.initColorPicker();
 };
 
@@ -189,12 +189,19 @@ strudel.SpiralTimelineController.prototype.updateRotations = function(n) {
         .range([0, this.radius]);
   }
   // Sets the max value on range slider based on updated rotations value.
-  // TODO: throw this into its own method so that when we update the
-  // slider UI, we can update how this works too.
-  d3.selectAll('.rangeSlider')
-      .attr("max", this.numRotations)
+  this.updateZoomSlider();
 
   this.updatePath();
+};
+
+
+/**
+ * Update range zoom slider.
+ */
+strudel.SpiralTimelineController.prototype.updateZoomSlider = function() {
+  var self = this;
+  this.zoomRangeSlider.updateValues(self.numRotations, self.zoomRangeStart, self.zoomRangeEnd);
+
 };
 
 /**
@@ -266,13 +273,13 @@ strudel.SpiralTimelineController.prototype.initSliders = function() {
   d3.select("#v-value").text(this.zoomRangeEnd);
   d3.select("#v").property("value", this.zoomRangeEnd);
 
+  this.zoomRangeSlider = new strudel.ui.ZoomRangeSlider(this.numRotations, this.zoomRangeStart, this.zoomRangeEnd);
+
   this.updateRotations(this.numRotations);
   this.updateResolution(this.resolution);
   this.updatePathWeight(this.pathWeight);
 
   this.updatePath();
-
-  this.zoomRangeSlider = new strudel.ui.ZoomRangeSlider();
 
 };
 
@@ -282,7 +289,7 @@ strudel.SpiralTimelineController.prototype.initSliders = function() {
 strudel.SpiralTimelineController.prototype.addSliderListeners = function() {
   var self = this;
 
-
+  /* Old slider stuff -- leaving for reference but we're changing the UI
   // Select the <input> range element and attaches a listener to when the input
   // value changes.  On input change, call "update" function with the new value.
   d3.selectAll(".rangeSlider").on("input", function() {
@@ -306,6 +313,28 @@ strudel.SpiralTimelineController.prototype.addSliderListeners = function() {
 
     self.updateZoomRange(Number(zoomRangeStart), Number(zoomRangeEnd));
 
+  });
+  */
+  // New listeners for range zoom value changes.
+  this.zoomRangeSlider.element.on({
+    slide: function(){
+      var zoomRangeStart = $("#range").val()[0];
+      var zoomRangeEnd = $("#range").val()[1];
+
+      self.updateZoomRange(Number(zoomRangeStart), Number(zoomRangeEnd));
+    },
+    set: function(){
+      var zoomRangeStart = $("#range").val()[0];
+      var zoomRangeEnd = $("#range").val()[1];
+
+      self.updateZoomRange(Number(zoomRangeStart), Number(zoomRangeEnd));
+    },
+    change: function(){
+      var zoomRangeStart = $("#range").val()[0];
+      var zoomRangeEnd = $("#range").val()[1];
+
+      self.updateZoomRange(Number(zoomRangeStart), Number(zoomRangeEnd));
+    }
   });
 
 
@@ -369,17 +398,13 @@ strudel.SpiralTimelineController.prototype.updatePoints = function () {
   var circle = this.svg.selectAll("circle")
       .data(plotData);
 
-
   var sizes = [];
   circle.exit().remove();
-
 
   circle.enter().append("circle")
     .attr('r', function(d) {
         var size = Math.sqrt(d[1]);
-
         return size;
-
      })
 
   circle
