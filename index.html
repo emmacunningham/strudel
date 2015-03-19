@@ -68,18 +68,24 @@
   <!-- Includes wNumb, libLink and the pips add-on -->
   <script src="lib/noUiSlider/jquery.nouislider.all.min.js"></script>
 
-<!--
+  <!-- Lodash -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.5.0/lodash.min.js"></script>
+
+<!-- old shit
 
   <script type="text/javascript" src="rangeZoomSpiral.js"></script>
 -->
   <script type="text/javascript" src="strudelJs/MathUtils.js"></script>
   <script type="text/javascript" src="strudelJs/ui/ZoomRangeSlider.js"></script>
+  <script type="text/javascript" src="strudelJs/dataHandlers/ClipsSample.js"></script>
 
   <script type="text/javascript" src="strudelJs/SpiralTimelineController.js"></script>
 
   <script>
     var spiral = new strudel.SpiralTimelineController();
 
+    var data = new strudel.dataHandlers.ClipsSample();
+    spiral.updateData(data.processedData);
   </script>
 
  </body>

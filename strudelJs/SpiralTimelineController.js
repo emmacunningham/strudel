@@ -24,7 +24,7 @@ strudel.SpiralTimelineController = function(params) {
    * Number of rotations around the origin.
    * @type {Number}
    */
-  this.numRotations = 6;
+  this.numRotations = 10;
 
   /**
    * Resolution of the datapoints drawn on curve.
@@ -378,6 +378,20 @@ strudel.SpiralTimelineController.prototype.newDataGenerator = function(zoomRange
 
 };
 
+
+/**
+ * Update data.
+ * @param {Array.<Number>} data - array of datapoints to plot on graph.
+ */
+strudel.SpiralTimelineController.prototype.updateData = function (data) {
+
+  this.datapoints = data;
+
+  this.updatePoints();
+
+};
+
+
 /**
  * Update data points on curve.
  */
@@ -403,7 +417,7 @@ strudel.SpiralTimelineController.prototype.updatePoints = function () {
 
   circle.enter().append("circle")
     .attr('r', function(d) {
-        var size = Math.sqrt(d[1]);
+        var size = 2;
         return size;
      })
 

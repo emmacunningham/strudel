@@ -1,5 +1,5 @@
 /**
- * @fileoverview Controller class for Spiral Timeline generator.
+ * @fileoverview Controller class for ZoomRangeSlider.
  */
 
 
