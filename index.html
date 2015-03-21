@@ -28,7 +28,7 @@
            rotations = <span id="r-value">…</span>
     </label>
 
-    <input type="range" min="0" max="24" id="rotationSlider" step="0.1">
+    <input type="range" min="0" max="200" id="rotationSlider" step="0.1">
 
     <br />
 
@@ -85,6 +85,7 @@
     var spiral = new strudel.SpiralTimelineController();
 
     var data = new strudel.dataHandlers.ClipsSample();
+
     spiral.updateData(data.processedData);
   </script>
 

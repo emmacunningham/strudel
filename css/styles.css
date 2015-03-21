@@ -1,10 +1,18 @@
 /* Range slider styles */
 #range {
-  margin: 60px auto;
-  width: 90%;
+  margin: 60px;
+  /*width: 90%;*/
+  height: 600px;
 }
 
 /* Graph styles */
+
+svg {
+  position: absolute;
+  left: 200px;
+  top: 300px;
+}
+
 .frame {
   fill: none;
   stroke: #000;

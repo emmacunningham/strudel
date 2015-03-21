@@ -23,8 +23,8 @@ strudel.ui.ZoomRangeSlider = function(max, start, end) {
     snap: false,
     margin: .1,
     connect: true,
-    direction: 'ltr',
-    orientation: 'horizontal',
+    direction: 'rtl',
+    orientation: 'vertical',
 
     // Configure tapping, or make the selected range dragable.
     behaviour: 'tap-drag',

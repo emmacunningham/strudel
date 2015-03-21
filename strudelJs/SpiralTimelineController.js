@@ -14,6 +14,7 @@ var strudel = strudel || {};
  * @constructor
  */
 strudel.SpiralTimelineController = function(params) {
+
   /**
    * Whether the graph should be contained within the viewport.
    * @type {Boolean}
@@ -60,13 +61,13 @@ strudel.SpiralTimelineController = function(params) {
    * Graph container width.
    * @type {Number}
    */
-  this.width = 960;
+  this.width = 800;
 
   /**
    * Graph container height.
    * @type {Number}
    */
-  this.height = 600;
+  this.height = 800;
 
   /**
    * Graph container radius.
@@ -268,11 +269,6 @@ strudel.SpiralTimelineController.prototype.initColorPicker = function() {
  */
 strudel.SpiralTimelineController.prototype.initSliders = function() {
 
-  d3.select("#d-value").text(this.zoomRangeStart);
-  d3.select("#d").property("value", this.zoomRangeStart);
-  d3.select("#v-value").text(this.zoomRangeEnd);
-  d3.select("#v").property("value", this.zoomRangeEnd);
-
   this.zoomRangeSlider = new strudel.ui.ZoomRangeSlider(this.numRotations, this.zoomRangeStart, this.zoomRangeEnd);
 
   this.updateRotations(this.numRotations);
@@ -316,23 +312,24 @@ strudel.SpiralTimelineController.prototype.addSliderListeners = function() {
   });
   */
   // New listeners for range zoom value changes.
+
   this.zoomRangeSlider.element.on({
     slide: function(){
       var zoomRangeStart = $("#range").val()[0];
       var zoomRangeEnd = $("#range").val()[1];
-      console.log($("#range").val());
+      //console.log($("#range").val());
       self.updateZoomRange(Number(zoomRangeStart), Number(zoomRangeEnd));
     },
     set: function(){
       var zoomRangeStart = $("#range").val()[0];
       var zoomRangeEnd = $("#range").val()[1];
-      console.log($("#range").val());
+      //console.log($("#range").val());
       self.updateZoomRange(Number(zoomRangeStart), Number(zoomRangeEnd));
     },
     change: function(){
       var zoomRangeStart = $("#range").val()[0];
       var zoomRangeEnd = $("#range").val()[1];
-      console.log($("#range").val());
+      //console.log($("#range").val());
       self.updateZoomRange(Number(zoomRangeStart), Number(zoomRangeEnd));
     }
   });
@@ -398,7 +395,6 @@ strudel.SpiralTimelineController.prototype.updateData = function (data) {
 strudel.SpiralTimelineController.prototype.updatePoints = function () {
   var self = this;
 
-  // Getting closer...
   var plotData = this.datapoints.map(this.newDataGenerator(this.zoomRangeStart, this.zoomRangeEnd, this.numRotations));
 
   var polarToCarX = function(d) {
@@ -424,5 +420,9 @@ strudel.SpiralTimelineController.prototype.updatePoints = function () {
   circle
       .attr("cx", function (d) { return polarToCarX(d); })
       .attr("cy", function (d) { return polarToCarY(d); });
+
+  circle.on('click', function() {
+    alert($(this).attr('cx'));
+  });
 
 };
