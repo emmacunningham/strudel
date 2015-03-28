@@ -259,7 +259,7 @@ strudel.SpiralTimelineController.prototype.initColorPicker = function() {
       layout:'hex',
       submit:0,
       onChange: self.updateColor,
-      color: '#ff0000'
+      color: '#b3b3b3'
   });
 };
 
@@ -380,7 +380,7 @@ strudel.SpiralTimelineController.prototype.newDataGenerator = function(zoomRange
  * Update data.
  * @param {Array.<Number>} data - array of datapoints to plot on graph.
  */
-strudel.SpiralTimelineController.prototype.updateData = function (data) {
+strudel.SpiralTimelineController.prototype.updateData = function(data) {
 
   this.datapoints = data;
 
@@ -390,19 +390,90 @@ strudel.SpiralTimelineController.prototype.updateData = function (data) {
 
 
 /**
+ * Attaches metadata to circles.
+ */
+strudel.SpiralTimelineController.prototype.attachMetadata = function () {
+};
+
+
+/**
+ * Fetches relevant points data from complex data array.
+ */
+strudel.SpiralTimelineController.prototype.getDataPoints = function (array, key) {
+
+  for (var i = 0, l = array.length; i < l; i++) {
+    var time = array[i]['time'];
+
+    // retrieve polar coords
+    var polarCoords = this.newDataGenerator(this.zoomRangeStart, this.zoomRangeEnd, this.numRotations)(time);
+
+    // append to object
+    array[i]['polarCoords'] = polarCoords;
+
+  }
+
+  return array;
+};
+
+
+/**
+ * Assign color meaning based on some data.
+ */
+strudel.SpiralTimelineController.prototype.createColorMap = function (array, key) {
+
+    var uniquePlayers =  _.uniq(_.pluck(array, key));
+
+    // doing some stuff with all unique scoring players so we can automate colors
+    function getRandomColor() {
+      var letters = '0123456789ABCDEF'.split('');
+      var color = '#';
+      for (var i = 0; i < 6; i++ ) {
+          color += letters[Math.floor(Math.random() * 16)];
+      }
+      return color;
+    }
+
+    var colorMap = {};
+    for (var i = 0, l = uniquePlayers.length; i < l; i++) {
+      var key = this.slugify(uniquePlayers[i]);
+      var value = getRandomColor();
+      colorMap[key] = value;
+    }
+
+    return colorMap;
+
+};
+
+
+
+/*
+ * Prolly could throw this into a utils class if we have more of these.
+ */
+strudel.SpiralTimelineController.prototype.slugify = function (text) {
+  return text.toString().toLowerCase()
+    .replace(/\s+/g, '-')           // Replace spaces with -
+    .replace(/[^\w\-]+/g, '')       // Remove all non-word chars
+    .replace(/\-\-+/g, '-')         // Replace multiple - with single -
+    .replace(/^-+/, '')             // Trim - from start of text
+    .replace(/-+$/, '');            // Trim - from end of text
+};
+
+/**
  * Update data points on curve.
  */
 strudel.SpiralTimelineController.prototype.updatePoints = function () {
   var self = this;
+  var points = this.getDataPoints(this.datapoints, 'time');
+  var plotData = points;
 
-  var plotData = this.datapoints.map(this.newDataGenerator(this.zoomRangeStart, this.zoomRangeEnd, this.numRotations));
+  var colorMap = this.createColorMap(this.datapoints, 'player');
 
   var polarToCarX = function(d) {
-    return self.graphScale(d[1]) * Math.cos(-d[0]);
+    return self.graphScale(d['polarCoords'][1]) * Math.cos(-d['polarCoords'][0]);
   };
 
   var polarToCarY = function(d) {
-    return self.graphScale(d[1]) * Math.sin(-d[0]);
+    return self.graphScale(d['polarCoords'][1]) * Math.sin(-d['polarCoords'][0]);
   };
 
   var circle = this.svg.selectAll("circle")
@@ -413,16 +484,30 @@ strudel.SpiralTimelineController.prototype.updatePoints = function () {
 
   circle.enter().append("circle")
     .attr('r', function(d) {
-        var size = 2;
+        var size = d['points'] * 10;
         return size;
-     })
+    })
+    .attr('player', function(d) {
+      return d['player'];
+    })
+    .attr('points', function(d) {
+      return d['points'];
+    })
+    .attr('fill', function(d) {
+      var playerSlug = self.slugify(d['player']);
+      var color = colorMap[playerSlug];
+      return color;
+    })
+    .attr('opacity', function(d) {
+      return .5;
+    })
 
   circle
       .attr("cx", function (d) { return polarToCarX(d); })
       .attr("cy", function (d) { return polarToCarY(d); });
 
   circle.on('click', function() {
-    alert($(this).attr('cx'));
+    alert($(this).attr('player') + ' scores ' + $(this).attr('points'));
   });
 
 };
