@@ -83,10 +83,15 @@
 
   <script>
     var spiral = new strudel.SpiralTimelineController();
+    var dataHandler = new strudel.dataHandlers.ClipsSample();
 
-    var data = new strudel.dataHandlers.ClipsSample();
+    $.ajax('data/clips_sample.json').success(function(result) {
 
-    spiral.updateData(data.processedData);
+
+      var data = dataHandler.processData(result);
+      spiral.updateData(data);
+    });
+
   </script>
 
  </body>
