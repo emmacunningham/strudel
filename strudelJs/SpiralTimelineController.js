@@ -157,7 +157,7 @@ strudel.SpiralTimelineController.prototype.updatePath = function() {
   // so we need to update the value of the d attribute on the <path> element
   this.svg.selectAll(".line")
     .datum(newData)
-    //.attr("d", this.line)
+    .attr("d", this.line)
 
   this.updatePoints(this.zoomRangeStart, this.zoomRangeEnd);
 
@@ -277,8 +277,10 @@ strudel.SpiralTimelineController.prototype.initColorPicker = function() {
 strudel.SpiralTimelineController.prototype.initSliders = function() {
 
   this.zoomRangeSlider = new strudel.ui.ZoomRangeSlider(this.numRotations, this.zoomRangeStart, this.zoomRangeEnd);
-
-  $('#resolutionSlider').attr('step', Math.PI / 16);
+/* this locks our resolution to divisions
+  $('#resolutionSlider').attr('step', Math.PI / 32);
+  $('#resolutionSlider').attr('max', Math.PI * 10);
+*/
 
   this.updateRotations(this.numRotations);
   this.updateResolution(this.resolution);
