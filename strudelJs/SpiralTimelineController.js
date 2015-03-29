@@ -136,7 +136,10 @@ strudel.SpiralTimelineController = function(params) {
   this.addSliderListeners();
   this.initColorPicker();
 
-  setInterval(function() { self.setPointColors(); }, 1500);
+
+  this.animationInterval = 500;
+
+  setInterval(function() { self.setPointColors(); }, self.animationInterval * 2);
 };
 
 
@@ -466,13 +469,13 @@ strudel.SpiralTimelineController.prototype.slugify = function (text) {
 
 
 strudel.SpiralTimelineController.prototype.setPointColors = function () {
-  var circle = this.svg.selectAll("circle")
+  var circle = this.svg.selectAll("circle");
   var self = this;
   var colorMap = this.createColorMap(this.datapoints, 'player');
 
   circle
-    .transition().duration(500)
-    .attr('fill', function(d) {
+    .transition().duration(self.animationInterval)
+    .attr('fill', function(d, i) {
       var playerSlug = self.slugify(d['player']);
       var color = colorMap[playerSlug];
       return color;
@@ -502,7 +505,6 @@ strudel.SpiralTimelineController.prototype.updatePoints = function () {
   var circle = this.svg.selectAll("circle")
       .data(plotData);
 
-  var sizes = [];
   circle.exit().remove();
 
   circle.enter().append("circle")
