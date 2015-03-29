@@ -128,11 +128,15 @@ strudel.SpiralTimelineController = function(params) {
   this.svg.append("path")
       .attr("class", "line");
 
+  // Create <path> element with class line and append it to svg's last child <g>
+  this.tooltip = $('body').append($('<div class="tooltip"></div>'));
 
   // We may wish to throw all of this into an init method.
   this.initSliders();
   this.addSliderListeners();
   this.initColorPicker();
+
+  setInterval(function() { self.setPointColors(); }, 1500);
 };
 
 
@@ -150,7 +154,7 @@ strudel.SpiralTimelineController.prototype.updatePath = function() {
   // so we need to update the value of the d attribute on the <path> element
   this.svg.selectAll(".line")
     .datum(newData)
-    .attr("d", this.line)
+    //.attr("d", this.line)
 
   this.updatePoints(this.zoomRangeStart, this.zoomRangeEnd);
 
@@ -270,6 +274,8 @@ strudel.SpiralTimelineController.prototype.initColorPicker = function() {
 strudel.SpiralTimelineController.prototype.initSliders = function() {
 
   this.zoomRangeSlider = new strudel.ui.ZoomRangeSlider(this.numRotations, this.zoomRangeStart, this.zoomRangeEnd);
+
+  $('#resolutionSlider').attr('step', Math.PI / 16);
 
   this.updateRotations(this.numRotations);
   this.updateResolution(this.resolution);
@@ -458,6 +464,23 @@ strudel.SpiralTimelineController.prototype.slugify = function (text) {
     .replace(/-+$/, '');            // Trim - from end of text
 };
 
+
+strudel.SpiralTimelineController.prototype.setPointColors = function () {
+  var circle = this.svg.selectAll("circle")
+  var self = this;
+  var colorMap = this.createColorMap(this.datapoints, 'player');
+
+  circle
+    .transition().duration(500)
+    .attr('fill', function(d) {
+      var playerSlug = self.slugify(d['player']);
+      var color = colorMap[playerSlug];
+      return color;
+    })
+
+};
+
+
 /**
  * Update data points on curve.
  */
@@ -484,7 +507,7 @@ strudel.SpiralTimelineController.prototype.updatePoints = function () {
 
   circle.enter().append("circle")
     .attr('r', function(d) {
-        var size = d['points'] * 10;
+        var size = d['points'] * 3;
         return size;
     })
     .attr('player', function(d) {
@@ -493,21 +516,30 @@ strudel.SpiralTimelineController.prototype.updatePoints = function () {
     .attr('points', function(d) {
       return d['points'];
     })
-    .attr('fill', function(d) {
-      var playerSlug = self.slugify(d['player']);
-      var color = colorMap[playerSlug];
-      return color;
-    })
     .attr('opacity', function(d) {
-      return .5;
+      return 1;
     })
+
+  this.setPointColors();
 
   circle
       .attr("cx", function (d) { return polarToCarX(d); })
       .attr("cy", function (d) { return polarToCarY(d); });
 
   circle.on('click', function() {
-    alert($(this).attr('player') + ' scores ' + $(this).attr('points'));
+    //alert($(this).attr('player') + ' scores ' + $(this).attr('points'));
+    self.updateTooltip(this, {'player': $(this).attr('player'), 'points': $(this).attr('points')});
   });
 
+};
+
+/**
+ * Update tooltip based on metadata.
+ */
+strudel.SpiralTimelineController.prototype.updateTooltip = function(el, data) {
+  $('.tooltip').empty();
+  var tooltipDetails = $('<div class="tooltip-player">Player: ' + data['player'] + '</div>' +
+                  '<div class="tooltip-points">Points: ' + data['points'] + '</div>');
+  console.log(tooltipDetails)
+  $('.tooltip').append(tooltipDetails);
 };
