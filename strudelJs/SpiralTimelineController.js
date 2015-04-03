@@ -28,10 +28,10 @@ strudel.SpiralTimelineController = function(params) {
   this.numRotations = 10;
 
   /**
-   * Resolution of the datapoints drawn on curve.
+   * Number of path points per rotation of the spiral
    * @type {Number}
    */
-  this.resolution = .01;
+  this.resolution = 50;
 
   /**
    * Weight of the stroke used to draw the curve.
@@ -142,7 +142,7 @@ strudel.SpiralTimelineController = function(params) {
  */
 strudel.SpiralTimelineController.prototype.updatePath = function() {
 
-  var newData = d3.range(0, this.numRotations * 2 * Math.PI, this.resolution)
+  var newData = d3.range(0, this.numRotations * 2 * Math.PI, Math.PI * 2 / this.resolution)
           .map(this.newDataGenerator(this.zoomRangeEnd, this.zoomRangeStart, this.numRotations));
 
   // Apply those new data points.  D3 will use the radial line function
