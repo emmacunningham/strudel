@@ -139,7 +139,7 @@ strudel.SpiralTimelineController = function(params) {
 
   this.animationInterval = 500;
 
-  setInterval(function() { self.setPointColors(); }, self.animationInterval * 2);
+  //setInterval(function() { self.setPointColors(); }, self.animationInterval * 2);
 };
 
 
