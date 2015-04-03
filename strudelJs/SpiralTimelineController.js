@@ -31,7 +31,7 @@ strudel.SpiralTimelineController = function(params) {
    * Number of path points per rotation of the spiral
    * @type {Number}
    */
-  this.resolution = 50;
+  this.resolution = 48;
 
   /**
    * Weight of the stroke used to draw the curve.
