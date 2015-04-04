@@ -188,10 +188,8 @@ strudel.SpiralTimelineController = function(params) {
   this.updateBackground();
 
   this.animationInterval = 500;
-  setInterval(function() {
-    if (self.animatePoints) {
-      self.setPointColors();
-    }
+  this.animationLoop = setInterval(function() {
+    self.setPointColors();
   }, self.animationInterval * 2);
 };
 
@@ -441,10 +439,15 @@ strudel.SpiralTimelineController.prototype.addListeners = function() {
   $('#show-animation').change(function(e) {
     if (e.currentTarget.checked) {
       self.animatePoints = true;
+      self.animationLoop = setInterval(function() {
+        self.setPointColors();
+      }, self.animationInterval * 2);
     }
     else {
       self.animatePoints = false;
+      clearInterval(self.animationLoop);
     }
+
   });
 
   // Listen for checkbox changes on scale-points
