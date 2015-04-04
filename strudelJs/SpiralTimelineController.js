@@ -58,6 +58,18 @@ strudel.SpiralTimelineController = function(params) {
   this.displayLine = true;
 
   /**
+   * Whether to animate the points on an interval.
+   * @type {boolean}
+   */
+  this.animatePoints = true;
+
+  /**
+   * Whether to scale the points per some data.
+   * @type {boolean}
+   */
+  this.scalePoints = true;
+
+  /**
    * Math helpers.
    * @type {strudel.MathUtils}
    */
@@ -144,7 +156,11 @@ strudel.SpiralTimelineController = function(params) {
 
 
   this.animationInterval = 500;
-  //setInterval(function() { self.setPointColors(); }, self.animationInterval * 2);
+  setInterval(function() {
+    if (self.animatePoints) {
+      self.setPointColors();
+    }
+  }, self.animationInterval * 2);
 };
 
 
@@ -378,7 +394,7 @@ strudel.SpiralTimelineController.prototype.addListeners = function() {
     self.updatePathWeight(+Number(this.value));
   });
 
-  // Listen for checkbox changes
+  // Listen for checkbox changes on show-line
   $('#show-line').change(function(e) {
     if (e.currentTarget.checked) {
       self.displayLine = true;
@@ -388,6 +404,30 @@ strudel.SpiralTimelineController.prototype.addListeners = function() {
     }
     self.updatePath();
   });
+
+  // Listen for checkbox changes on show-animation
+  $('#show-animation').change(function(e) {
+    if (e.currentTarget.checked) {
+      self.animatePoints = true;
+    }
+    else {
+      self.animatePoints = false;
+    }
+  });
+
+  // Listen for checkbox changes on scale-points
+  $('#scale-points').change(function(e) {
+    if (e.currentTarget.checked) {
+      self.scalePoints = true;
+    }
+    else {
+      self.scalePoints = false;
+    }
+
+    self.updatePoints();
+  });
+
+
 
   $('#update-color-map').click(function(e) {
     self.setPointColors();
@@ -519,6 +559,7 @@ strudel.SpiralTimelineController.prototype.setPointColors = function () {
  */
 strudel.SpiralTimelineController.prototype.updatePoints = function () {
   var self = this;
+
   var points = this.getDataPoints(this.datapoints, 'time');
   var plotData = points;
 
@@ -538,10 +579,6 @@ strudel.SpiralTimelineController.prototype.updatePoints = function () {
   circle.exit().remove();
 
   circle.enter().append("circle")
-    .attr('r', function(d) {
-        var size = d['points'] * 3;
-        return size;
-    })
     .attr('player', function(d) {
       return d['player'];
     })
@@ -550,14 +587,26 @@ strudel.SpiralTimelineController.prototype.updatePoints = function () {
     })
     .attr('opacity', function(d) {
       return 1;
-    })
+    });
+
+  if (!self.scalePoints) {
+    console.log(self.scalePoints)
+    circle.attr('r', function(d) {
+      return 5;
+    });
+  }
+  else {
+    circle.attr('r', function(d) {
+      var size = d['points'] * 3;
+      return size;
+    });
+  }
 
   circle
       .attr("cx", function (d) { return polarToCarX(d); })
       .attr("cy", function (d) { return polarToCarY(d); });
 
   circle.on('click', function() {
-    //alert($(this).attr('player') + ' scores ' + $(this).attr('points'));
     self.updateTooltip(this, {'player': $(this).attr('player'), 'points': $(this).attr('points')});
   });
 
