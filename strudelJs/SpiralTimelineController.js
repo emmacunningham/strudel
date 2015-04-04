@@ -52,6 +52,12 @@ strudel.SpiralTimelineController = function(params) {
   this.zoomRangeEnd = 4;
 
   /**
+   * Whether to display the path of the spiral.
+   * @type {boolean}
+   */
+  this.displayLine = true;
+
+  /**
    * Math helpers.
    * @type {strudel.MathUtils}
    */
@@ -133,7 +139,7 @@ strudel.SpiralTimelineController = function(params) {
 
   // We may wish to throw all of this into an init method.
   this.initSliders();
-  this.addSliderListeners();
+  this.addListeners();
   this.initColorPicker();
 
 
@@ -156,8 +162,18 @@ strudel.SpiralTimelineController.prototype.updatePath = function() {
   // that we have previously defined above to map those values to Cartesian coordinates
   // so we need to update the value of the d attribute on the <path> element
   this.svg.selectAll(".line")
-    .datum(newData)
-    .attr("d", this.line)
+    .datum(newData);
+
+  console.log(this.displayLine)
+
+  if (this.displayLine) {
+    this.svg.selectAll(".line")
+      .attr("d", this.line);
+  }
+  else {
+    this.svg.selectAll(".line")
+      .attr("d", null);
+  }
 
   this.updatePoints(this.zoomRangeStart, this.zoomRangeEnd);
 
@@ -293,7 +309,7 @@ strudel.SpiralTimelineController.prototype.initSliders = function() {
 /**
  * Add listeners for each input slider.
  */
-strudel.SpiralTimelineController.prototype.addSliderListeners = function() {
+strudel.SpiralTimelineController.prototype.addListeners = function() {
   var self = this;
 
   /* Old slider stuff -- leaving for reference but we're changing the UI
@@ -363,6 +379,17 @@ strudel.SpiralTimelineController.prototype.addSliderListeners = function() {
   // value changes.  On input change, call "updatePathWeight" function with the new value.
   d3.select("#path-weight").on("input", function() {
     self.updatePathWeight(+Number(this.value));
+  });
+
+  // Listen for checkbox changes
+  $('#show-line').change(function(e) {
+    if (e.currentTarget.checked) {
+      self.displayLine = true;
+    }
+    else {
+      self.displayLine = false;
+    }
+    self.updatePath();
   });
 
 };
