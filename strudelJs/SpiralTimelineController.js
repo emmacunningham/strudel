@@ -80,7 +80,7 @@ strudel.SpiralTimelineController = function(params) {
    * Whether to show background image.
    * @type {boolean}
    */
-  this.showBackground = true;
+  this.showBackground = false;
 
   /**
    * Background opacity
@@ -168,7 +168,7 @@ strudel.SpiralTimelineController = function(params) {
    * Apply transformations to center the graph within the parent container.
    * @type {Element}
    */
-  this.svg = d3.select("body").append("svg")
+  this.svg = d3.select(".spiral-container").append("svg")
       .attr("width", this.width)
       .attr("height", this.height)
       .append("g")
@@ -505,6 +505,12 @@ strudel.SpiralTimelineController.prototype.addListeners = function() {
   d3.select("#bg-distance").on("input", function() {
     self.bgDistance = Number(this.value);
     self.updateBackground();
+  });
+
+
+  $('.menu-toggle').click(function(e) {
+    $('.strudel-options').toggle();
+    $('body').toggleClass('menu-active');
   });
 
 };
