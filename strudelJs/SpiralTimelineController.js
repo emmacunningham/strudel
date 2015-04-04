@@ -88,6 +88,12 @@ strudel.SpiralTimelineController = function(params) {
    */
   this.bgOpacity = .5;
 
+  /**
+   * Background blur
+   * @type {Number}
+   */
+  this.bgBlur = 0;
+
 
   /**
    * Math helpers.
@@ -482,6 +488,11 @@ strudel.SpiralTimelineController.prototype.addListeners = function() {
     self.updateBackground();
   });
 
+  d3.select("#bg-blur").on("input", function() {
+    self.bgBlur = Number(this.value);
+    self.updateBackground();
+  });
+
 };
 
 /**
@@ -496,7 +507,10 @@ strudel.SpiralTimelineController.prototype.updateBackground = function() {
     $('.spiral-bg').hide();
   }
 
-  $('.spiral-bg').css({'opacity': this.bgOpacity});
+  $('.spiral-bg').css({
+    'opacity': this.bgOpacity,
+    '-webkit-filter': 'blur(' + this.bgBlur + 'px)'
+  });
 
 };
 
