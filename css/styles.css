@@ -1,9 +1,16 @@
 /* Range slider styles */
 #range {
-  margin: 60px;
-  /*width: 90%;*/
+  margin: 60px 20px;
   height: 600px;
 }
+
+/* Temp styles for ui stuff */
+.strudel-options {
+  position: absolute;
+  bottom: 320px;
+  left: 120px;
+}
+
 
 /* Graph styles */
 
@@ -33,7 +40,7 @@ svg {
 }
 
 
-/* Zoom Range Slider styles */
+/* slider styles */
 .axis path,
 .axis line {
   fill: none;

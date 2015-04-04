@@ -144,7 +144,6 @@ strudel.SpiralTimelineController = function(params) {
 
 
   this.animationInterval = 500;
-
   //setInterval(function() { self.setPointColors(); }, self.animationInterval * 2);
 };
 
@@ -163,8 +162,6 @@ strudel.SpiralTimelineController.prototype.updatePath = function() {
   // so we need to update the value of the d attribute on the <path> element
   this.svg.selectAll(".line")
     .datum(newData);
-
-  console.log(this.displayLine)
 
   if (this.displayLine) {
     this.svg.selectAll(".line")
@@ -392,6 +389,10 @@ strudel.SpiralTimelineController.prototype.addListeners = function() {
     self.updatePath();
   });
 
+  $('#update-color-map').click(function(e) {
+    self.setPointColors();
+  });
+
 };
 
 
@@ -550,8 +551,6 @@ strudel.SpiralTimelineController.prototype.updatePoints = function () {
     .attr('opacity', function(d) {
       return 1;
     })
-
-  this.setPointColors();
 
   circle
       .attr("cx", function (d) { return polarToCarX(d); })
