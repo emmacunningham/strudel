@@ -82,6 +82,12 @@ strudel.SpiralTimelineController = function(params) {
    */
   this.showBackground = true;
 
+  /**
+   * Background opacity
+   * @type {Number}
+   */
+  this.bgOpacity = .5;
+
 
   /**
    * Math helpers.
@@ -167,7 +173,7 @@ strudel.SpiralTimelineController = function(params) {
   this.initSliders();
   this.addListeners();
   this.initColorPicker();
-
+  this.updateBackground();
 
   this.animationInterval = 500;
   setInterval(function() {
@@ -470,6 +476,12 @@ strudel.SpiralTimelineController.prototype.addListeners = function() {
     self.setPointColors();
   });
 
+
+  d3.select("#bg-opacity").on("input", function() {
+    self.bgOpacity = Number(this.value);
+    self.updateBackground();
+  });
+
 };
 
 /**
@@ -483,6 +495,9 @@ strudel.SpiralTimelineController.prototype.updateBackground = function() {
   else {
     $('.spiral-bg').hide();
   }
+
+  $('.spiral-bg').css({'opacity': this.bgOpacity});
+
 };
 
 
