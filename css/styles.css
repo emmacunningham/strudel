@@ -11,12 +11,23 @@
   left: 120px;
 }
 
+.spiral-bg {
+  position: absolute;
+  left: 300px;
+  top: 300px;
+  z-index: -10;
+  width: 800px;
+  height: 800px;
+  background-size: cover;
+  background-position: center;
+  background-image: url('http://r.fod4.com/c=sq/s=w1000,pd1/o=80/http://p.fod4.com/p/channels/gaiga/profile/s=w1200/o=95/ArE6m3YQVW5prtNbf44t_deandre_jordan.jpg');
+}
 
 /* Graph styles */
 
 svg {
   position: absolute;
-  left: 200px;
+  left: 300px;
   top: 300px;
   background: rgba(0,0,0,.01);
 }

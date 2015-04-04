@@ -70,6 +70,20 @@ strudel.SpiralTimelineController = function(params) {
   this.scalePoints = true;
 
   /**
+   * Whether to color the points per some data.
+   * @type {boolean}
+   */
+  this.colorPoints = true;
+
+
+  /**
+   * Whether to show background image.
+   * @type {boolean}
+   */
+  this.showBackground = true;
+
+
+  /**
    * Math helpers.
    * @type {strudel.MathUtils}
    */
@@ -427,12 +441,48 @@ strudel.SpiralTimelineController.prototype.addListeners = function() {
     self.updatePoints();
   });
 
+  // Listen for checkbox changes on scale-points
+  $('#color-points').change(function(e) {
+    if (e.currentTarget.checked) {
+      self.colorPoints = true;
+    }
+    else {
+      self.colorPoints = false;
+    }
+
+    self.setPointColors();
+  });
+
+  // Listen for checkbox changes on scale-points
+  $('#show-bg').change(function(e) {
+    if (e.currentTarget.checked) {
+      self.showBackground = true;
+    }
+    else {
+      self.showBackground = false;
+    }
+
+    self.updateBackground();
+  });
 
 
   $('#update-color-map').click(function(e) {
     self.setPointColors();
   });
 
+};
+
+/**
+ * Update background.
+ */
+strudel.SpiralTimelineController.prototype.updateBackground = function() {
+
+  if (this.showBackground) {
+    $('.spiral-bg').show();
+  }
+  else {
+    $('.spiral-bg').hide();
+  }
 };
 
 
@@ -543,14 +593,26 @@ strudel.SpiralTimelineController.prototype.setPointColors = function () {
   var self = this;
   var colorMap = this.createColorMap(this.datapoints, 'player');
 
-  circle
-    .transition().duration(self.animationInterval)
-    .attr('fill', function(d, i) {
-      var playerSlug = self.slugify(d['player']);
-      var color = colorMap[playerSlug];
-      return color;
-    })
+  if (self.colorPoints) {
 
+    circle
+      .transition().duration(self.animationInterval)
+      .attr('fill', function(d, i) {
+        var playerSlug = self.slugify(d['player']);
+        var color = colorMap[playerSlug];
+        return color;
+      });
+
+  }
+  else {
+    circle
+      .transition().duration(self.animationInterval)
+      .attr('fill', function(d, i) {
+        var playerSlug = self.slugify(d['player']);
+        var color = "#000";
+        return color;
+      });
+  }
 };
 
 
@@ -590,7 +652,6 @@ strudel.SpiralTimelineController.prototype.updatePoints = function () {
     });
 
   if (!self.scalePoints) {
-    console.log(self.scalePoints)
     circle.attr('r', function(d) {
       return 5;
     });
