@@ -20,6 +20,7 @@
   height: 800px;
   background-size: cover;
   background-position: center;
+  background-repeat: no-repeat;
   background-image: url('http://r.fod4.com/c=sq/s=w1000,pd1/o=80/http://p.fod4.com/p/channels/gaiga/profile/s=w1200/o=95/ArE6m3YQVW5prtNbf44t_deandre_jordan.jpg');
 }
 

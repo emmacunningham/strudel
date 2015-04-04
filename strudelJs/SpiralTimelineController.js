@@ -94,6 +94,12 @@ strudel.SpiralTimelineController = function(params) {
    */
   this.bgBlur = 0;
 
+  /**
+   * Background distance along z-axis from spiral.
+   * @type {Number}
+   */
+  this.bgDistance = 0;
+
 
   /**
    * Math helpers.
@@ -493,6 +499,11 @@ strudel.SpiralTimelineController.prototype.addListeners = function() {
     self.updateBackground();
   });
 
+  d3.select("#bg-distance").on("input", function() {
+    self.bgDistance = Number(this.value);
+    self.updateBackground();
+  });
+
 };
 
 /**
@@ -509,7 +520,8 @@ strudel.SpiralTimelineController.prototype.updateBackground = function() {
 
   $('.spiral-bg').css({
     'opacity': this.bgOpacity,
-    '-webkit-filter': 'blur(' + this.bgBlur + 'px)'
+    '-webkit-filter': 'blur(' + this.bgBlur + 'px)',
+    'background-size': (100 - this.bgDistance) + '%'
   });
 
 };
