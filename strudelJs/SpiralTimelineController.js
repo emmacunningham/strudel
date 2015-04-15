@@ -16,6 +16,12 @@ var strudel = strudel || {};
 strudel.SpiralTimelineController = function(params) {
 
   /**
+   * Namespace to use for elements.
+   * @type {String}
+   */
+  this.namespace = 'strudel';
+
+  /**
    * Whether the graph should be contained within the viewport.
    * @type {Boolean}
    */
@@ -513,6 +519,11 @@ strudel.SpiralTimelineController.prototype.addListeners = function() {
     $('body').toggleClass('menu-active');
   });
 
+  $('.options-toggle').click(function(e) {
+    $(this).next().toggle();
+    $(this).toggleClass('options-active')
+  });
+
 };
 
 /**
@@ -732,4 +743,14 @@ strudel.SpiralTimelineController.prototype.updateTooltip = function(el, data) {
                   '<div class="tooltip-points">Points: ' + data['points'] + '</div>');
   console.log(tooltipDetails)
   $('.tooltip').append(tooltipDetails);
+};
+
+
+/**
+ * Creates a UI element that updates the graph.
+ *
+ */
+strudel.SpiralTimelineController.prototype.createUiElement = function(name, type, eventHandler) {
+
+
 };

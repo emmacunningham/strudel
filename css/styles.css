@@ -2,6 +2,12 @@
 
 body {
   font-family: 'Alegreya Sans SC', sans-serif;
+  margin: 0;
+}
+
+html, body {
+  height: 100%;
+  overflow: hidden;
 }
 
 /* Range slider styles */
@@ -22,12 +28,56 @@ body {
 }
 
 .strudel-options {
-  position: absolute;
   display: none;
   /*
   top: 380px;
   left: 120px;
   */
+}
+
+.menu-active .strudel-options {
+  display: block;
+  padding: 20px 0;
+}
+
+.options-toggle {
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.options-toggle::after {
+  width: 0;
+  height: 0;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-left: 5px solid #000;
+  content: ' ';
+  display: inline-block;
+  margin-left: 10px;
+  transition: transform .25s;
+}
+
+.options-active.options-toggle::after {
+  transform: rotate(90deg);
+}
+
+.option-set {
+  box-sizing: border-box;
+  padding: 20px;
+  display: none;
+}
+
+.options-container {
+  box-sizing: border-box;
+  padding: 20px;
+  min-height: 100%;
+  overflow: scroll;
+  height: 100%;
+}
+
+.menu-active .options-container {
+  max-width: 400px;
+  background: #ececec;
 }
 
 .spiral-bg {
@@ -53,7 +103,7 @@ body {
 /* Graph styles */
 
 svg {
-
+  z-index: -50;
   position: absolute;
   margin: auto;
   top: 0;
