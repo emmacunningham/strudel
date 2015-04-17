@@ -492,6 +492,17 @@ strudel.SpiralTimelineController.prototype.addListeners = function() {
     self.updateBackground();
   });
 
+  // Listen for checkbox changes on show-points
+  $('#show-points').change(function(e) {
+    if (e.currentTarget.checked) {
+      $('circle').show();
+    }
+    else {
+      $('circle').hide();
+    }
+
+  });
+
 
   $('#update-color-map').click(function(e) {
     self.setPointColors();
