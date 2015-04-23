@@ -95,6 +95,19 @@ strudel.SpiralTimelineController = function(params) {
   this.bgOpacity = .5;
 
   /**
+   * Point opacity
+   * @type {Number}
+   */
+  this.pointOpacity = .5;
+
+  /**
+   * Point opacity
+   * @type {Number}
+   */
+  this.pointScale = 3;
+
+
+  /**
    * Background blur
    * @type {Number}
    */
@@ -514,6 +527,16 @@ strudel.SpiralTimelineController.prototype.addListeners = function() {
     self.updateBackground();
   });
 
+  d3.select("#point-opacity").on("input", function() {
+    self.pointOpacity = Number(this.value);
+    self.updatePointOpacity();
+  });
+
+  d3.select("#point-scale").on("input", function() {
+    self.pointScale = Number(this.value);
+    self.updatePoints();
+  });
+
   d3.select("#bg-blur").on("input", function() {
     self.bgBlur = Number(this.value);
     self.updateBackground();
@@ -691,6 +714,18 @@ strudel.SpiralTimelineController.prototype.setPointColors = function () {
 /**
  * Update data points on curve.
  */
+strudel.SpiralTimelineController.prototype.updatePointOpacity = function () {
+  var self = this;
+  var circle = this.svg.selectAll("circle")
+    .attr('opacity', function(d) {
+      return self.pointOpacity;
+    });
+};
+
+
+/**
+ * Update data points on curve.
+ */
 strudel.SpiralTimelineController.prototype.updatePoints = function () {
   var self = this;
 
@@ -720,17 +755,17 @@ strudel.SpiralTimelineController.prototype.updatePoints = function () {
       return d['points'];
     })
     .attr('opacity', function(d) {
-      return 1;
+      return self.pointOpacity;
     });
 
   if (!self.scalePoints) {
     circle.attr('r', function(d) {
-      return 5;
+      return self.pointScale;
     });
   }
   else {
     circle.attr('r', function(d) {
-      var size = d['points'] * 3;
+      var size = d['points'] * self.pointScale;
       return size;
     });
   }
