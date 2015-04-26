@@ -34,6 +34,24 @@ strudel.SpiralTimelineController = function(params) {
   this.numRotations = 10;
 
   /**
+   * Degree of rotations around the origin.
+   * @type {Number}
+   */
+  this.rotationOrigin = 0;
+
+  /**
+   * Degree of rotations around the X axis.
+   * @type {Number}
+   */
+  this.rotationX = 0;
+
+  /**
+   * Degree of rotations around the Y axis.
+   * @type {Number}
+   */
+  this.rotationY = 0;
+
+  /**
    * Number of path points per rotation of the spiral
    * @type {Number}
    */
@@ -545,6 +563,34 @@ strudel.SpiralTimelineController.prototype.addListeners = function() {
   d3.select("#bg-distance").on("input", function() {
     self.bgDistance = Number(this.value);
     self.updateBackground();
+  });
+
+
+  d3.select("#rotation-origin").on("input", function() {
+    self.rotationOrigin = Number(this.value);
+
+    $('svg').css({
+      'transform': 'rotate(' + self.rotationOrigin + 'deg)'
+    });
+
+  });
+
+  d3.select("#rotation-x").on("input", function() {
+    self.rotationX = Number(this.value);
+
+    $('svg').css({
+      'transform': 'rotateX(' + self.rotationX + 'deg)'
+    });
+
+  });
+
+  d3.select("#rotation-y").on("input", function() {
+    self.rotationY = Number(this.value);
+
+    $('svg').css({
+      'transform': 'rotateY(' + self.rotationY + 'deg)'
+    });
+
   });
 
 
