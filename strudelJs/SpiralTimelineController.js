@@ -85,7 +85,7 @@ strudel.SpiralTimelineController = function(params) {
    * Whether to animate the points on an interval.
    * @type {boolean}
    */
-  this.animatePoints = true;
+  this.animatePoints = false;
 
   /**
    * Whether to scale the points per some data.
@@ -105,6 +105,12 @@ strudel.SpiralTimelineController = function(params) {
    * @type {boolean}
    */
   this.showBackground = false;
+  
+  /**
+   * Whether to snap the points to the path polygon
+   * @type {boolean}
+   */
+  this.snapPoints = true;
 
   /**
    * Background opacity
@@ -225,9 +231,12 @@ strudel.SpiralTimelineController = function(params) {
   this.updateBackground();
 
   this.animationInterval = 500;
-  this.animationLoop = setInterval(function() {
-    self.setPointColors();
-  }, self.animationInterval * 2);
+  if (this.animatePoints) {
+    this.animationLoop = setInterval(function() {
+      self.setPointColors();
+    }, self.animationInterval * 2);
+  }
+
 };
 
 
@@ -238,7 +247,7 @@ strudel.SpiralTimelineController = function(params) {
 strudel.SpiralTimelineController.prototype.updatePath = function() {
 
   var newData = d3.range(0, this.numRotations * 2 * Math.PI, Math.PI * 2 / this.resolution)
-          .map(this.newDataGenerator(this.zoomRangeEnd, this.zoomRangeStart, this.numRotations));
+          .map(this.newDataGenerator(this.zoomRangeEnd, this.zoomRangeStart, this.numRotations, false));
 
   // Apply those new data points.  D3 will use the radial line function
   // that we have previously defined above to map those values to Cartesian coordinates
@@ -254,7 +263,7 @@ strudel.SpiralTimelineController.prototype.updatePath = function() {
     this.svg.selectAll(".line")
       .attr("d", null);
   }
-
+    
   this.updatePoints(this.zoomRangeStart, this.zoomRangeEnd);
 
 };
@@ -531,14 +540,23 @@ strudel.SpiralTimelineController.prototype.addListeners = function() {
     else {
       $('circle').hide();
     }
-
   });
+  
+  // Listen for checkbox changes on snap-points
+  $('#snap-points').change(function(e) {
+    if (e.currentTarget.checked) {
+      self.snapPoints = true;
+    }
+    else {
+      self.snapPoints = false;
+    }
 
+    self.updatePoints();
+  });
 
   $('#update-color-map').click(function(e) {
     self.setPointColors();
   });
-
 
   d3.select("#bg-opacity").on("input", function() {
     self.bgOpacity = Number(this.value);
@@ -634,12 +652,22 @@ strudel.SpiralTimelineController.prototype.updateBackground = function() {
  * @param {Number} l - number of rotations.
  * @return {Array.<Number>} - polar coordinates for theta and radius of a point.
  */
-strudel.SpiralTimelineController.prototype.newDataGenerator = function(zoomRangeStart, zoomRangeEnd, l) {
+strudel.SpiralTimelineController.prototype.newDataGenerator = function(zoomRangeStart, zoomRangeEnd, l, isData) {
   var self = this;
 
-  var spiralDataGenerator = function(theta) {
-    return [theta, self.utils.getRadius(theta, zoomRangeStart, zoomRangeEnd, l)];
-  };
+  if (this.snapPoints == false) {
+    var spiralDataGenerator = function(theta) {
+      return [theta, self.utils.getRadius(theta, zoomRangeStart, zoomRangeEnd, l)];
+    };
+  } else {
+    var spiralDataGenerator = function(theta) {
+      if (isData == false) {
+        return [theta, self.utils.getRadius(theta, zoomRangeStart, zoomRangeEnd, l)];
+      } else {
+        return [theta, self.utils.getPathRadius(theta, zoomRangeStart, zoomRangeEnd, l, self.resolution)];
+      }
+    };
+  }
 
   return spiralDataGenerator;
 
@@ -675,7 +703,23 @@ strudel.SpiralTimelineController.prototype.getDataPoints = function (array, key)
     var time = array[i]['time'];
 
     // retrieve polar coords
-    var polarCoords = this.newDataGenerator(this.zoomRangeStart, this.zoomRangeEnd, this.numRotations)(time);
+    var polarCoords = this.newDataGenerator(this.zoomRangeStart, this.zoomRangeEnd, this.numRotations, true)(time);
+
+    // append to object
+    array[i]['polarCoords'] = polarCoords;
+
+  }
+
+  return array;
+};
+
+strudel.SpiralTimelineController.prototype.getPathPoints = function (array, key) {
+
+  for (var i = 0, l = array.length; i < l; i++) {
+    var time = array[i]['time'];
+
+    // retrieve polar coords
+    var polarCoords = this.newDataGenerator(this.zoomRangeStart, this.zoomRangeEnd, this.numRotations, false)(time);
 
     // append to object
     array[i]['polarCoords'] = polarCoords;
@@ -781,11 +825,13 @@ strudel.SpiralTimelineController.prototype.updatePoints = function () {
   var colorMap = this.createColorMap(this.datapoints, 'player');
 
   var polarToCarX = function(d) {
-    return self.graphScale(d['polarCoords'][1]) * Math.cos(-d['polarCoords'][0]);
+        var carX = self.graphScale(d['polarCoords'][1]) * Math.cos(-d['polarCoords'][0]);
+        return carX;
   };
 
   var polarToCarY = function(d) {
-    return self.graphScale(d['polarCoords'][1]) * Math.sin(-d['polarCoords'][0]);
+        var carY = self.graphScale(d['polarCoords'][1]) * Math.sin(-d['polarCoords'][0]);
+        return carY;
   };
 
   var circle = this.svg.selectAll("circle")
@@ -843,6 +889,5 @@ strudel.SpiralTimelineController.prototype.updateTooltip = function(el, data) {
  *
  */
 strudel.SpiralTimelineController.prototype.createUiElement = function(name, type, eventHandler) {
-
 
 };

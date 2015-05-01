@@ -85,5 +85,3 @@ function update(nRadius) {
     .attr("d", line)
 
 }
-
-
