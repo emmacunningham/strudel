@@ -75,7 +75,6 @@ html, body {
   min-height: 100%;
   overflow: scroll;
   height: 100%;
-  display: none;
 }
 
 .menu-active .options-container {
