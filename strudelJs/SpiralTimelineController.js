@@ -105,7 +105,7 @@ strudel.SpiralTimelineController = function(params) {
    * @type {boolean}
    */
   this.showBackground = false;
-  
+
   /**
    * Whether to snap the points to the path polygon
    * @type {boolean}
@@ -263,7 +263,7 @@ strudel.SpiralTimelineController.prototype.updatePath = function() {
     this.svg.selectAll(".line")
       .attr("d", null);
   }
-    
+
   this.updatePoints(this.zoomRangeStart, this.zoomRangeEnd);
 
 };
@@ -541,7 +541,7 @@ strudel.SpiralTimelineController.prototype.addListeners = function() {
       $('circle').hide();
     }
   });
-  
+
   // Listen for checkbox changes on snap-points
   $('#snap-points').change(function(e) {
     if (e.currentTarget.checked) {
@@ -867,6 +867,7 @@ strudel.SpiralTimelineController.prototype.updatePoints = function () {
       .attr("cy", function (d) { return polarToCarY(d); });
 
   circle.on('click', function() {
+    console.log('clickerrs');
     self.updateTooltip(this, {'player': $(this).attr('player'), 'points': $(this).attr('points')});
   });
 
