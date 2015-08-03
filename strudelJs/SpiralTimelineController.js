@@ -55,7 +55,13 @@ strudel.SpiralTimelineController = function(params) {
    * Number of path points per rotation of the spiral
    * @type {Number}
    */
-  this.resolution = 48;
+  this.resolution = 6;
+  
+  /**
+   * Default number of test points per rotation of the spiral
+   * @type {Number}
+   */
+  this.testpoints = 6;
 
   /**
    * Weight of the stroke used to draw the curve.
@@ -74,6 +80,18 @@ strudel.SpiralTimelineController = function(params) {
    * @type {Number}
    */
   this.zoomRangeEnd = 4;
+  
+  /**
+   * Whether to display the data points.
+   * @type {boolean}
+   */
+  this.showPoints = true;
+  
+  /**
+   * Whether to display the test points.
+   * @type {boolean}
+   */
+  this.showTestpoints = false;
 
   /**
    * Whether to display the path of the spiral.
@@ -99,7 +117,6 @@ strudel.SpiralTimelineController = function(params) {
    */
   this.colorPoints = true;
 
-
   /**
    * Whether to show background image.
    * @type {boolean}
@@ -111,6 +128,14 @@ strudel.SpiralTimelineController = function(params) {
    * @type {boolean}
    */
   this.snapPoints = true;
+  
+  /**
+   * Whether to lock the number of test points to the
+   * resolution (i.e., plot one type of test point per
+   * segment of the path polygon). 
+   * @type {boolean}
+   */
+  this.lockTestpoints = true;
 
   /**
    * Background opacity
@@ -167,6 +192,27 @@ strudel.SpiralTimelineController = function(params) {
    * @type {Number}
    */
   this.radius = Math.min(this.width, this.height) / 2 - 30;
+ 
+
+  /**
+   * Custom polar-to-Cartesian conversion function for the 
+   * spiral doman, returning the X coordinate only
+   * @type {function}
+   */
+  this.polarToCarX = function(d) {
+    var carX = self.graphScale(d['polarCoords'][1]) * Math.cos(-d['polarCoords'][0]);
+    return carX;
+  };
+  
+  /**
+   * Custom polar-to-Cartesian conversion function for the 
+   * spiral doman, returning the Y coordinate only
+   * @type {function}
+   */
+  this.polarToCarY = function(d) {
+    var carY = self.graphScale(d['polarCoords'][1]) * Math.sin(-d['polarCoords'][0]);
+    return carY;
+  };
 
   /**
    * Function constraining domain and range of graph to fit within
@@ -276,6 +322,14 @@ strudel.SpiralTimelineController.prototype.updatePath = function() {
  */
 strudel.SpiralTimelineController.prototype.updateZoomRange = function(zoomRangeStart, zoomRangeEnd) {
 
+  /* PMB - it would be nice to have something like this (but hopefully less
+   * of a hack) to keep the zoom range from jamming at .1 when the number of 
+   * rotations drops to ~2
+  if ((zoomRangeEnd - zoomRangeStart <= .1)) {
+    zoomRangeEnd = zoomRangeStart + 1;
+  }
+  */
+
   this.zoomRangeStart = zoomRangeStart;
   this.zoomRangeEnd = zoomRangeEnd;
 
@@ -329,6 +383,24 @@ strudel.SpiralTimelineController.prototype.updateResolution = function(n) {
   d3.select("#resolutionSlider").property("value", n);
 
   this.resolution = n;
+
+  this.updatePath();
+
+};
+
+/**
+ * Update number of test points per rotation
+ * @param {Number} n - number of test points per rotation.
+ */
+strudel.SpiralTimelineController.prototype.updateTestpoints = function(n) {
+
+  var intN = Math.floor(n);
+
+  // adjust the text on the range slider
+  d3.select("#testpoints-value").text(n);
+  d3.select("#testpointsSlider").property("value", n);
+
+  this.testpoints = n;
 
   this.updatePath();
 
@@ -389,6 +461,7 @@ strudel.SpiralTimelineController.prototype.initSliders = function() {
 
   this.updateRotations(this.numRotations);
   this.updateResolution(this.resolution);
+  this.updateTestpoints(this.testpoints);
   this.updatePathWeight(this.pathWeight);
 
   this.updatePath();
@@ -461,8 +534,23 @@ strudel.SpiralTimelineController.prototype.addListeners = function() {
   // value changes.  On input change, call "updateResolution" function with the new value.
   d3.select("#resolutionSlider").on("input", function() {
     self.updateResolution(+Number(this.value));
+
+    if (self.lockTestpoints == true) {
+      self.updateTestpoints(+Number(this.value));      
+    }
+
   });
 
+  // Select the <input> testpoints element and attaches a listener to when the input
+  // value changes.  On input change, call "updateTestpoints" function with the new value.
+  d3.select("#testpointsSlider").on("input", function() {
+    self.updateTestpoints(+Number(this.value));
+    
+    if (self.lockTestpoints == true) {
+      self.updateResolution(+Number(this.value));      
+    }
+
+  });
 
   // Select the <input> rotation element and attaches a listener to when the input
   // value changes.  On input change, call "updatePathWeight" function with the new value.
@@ -534,11 +622,27 @@ strudel.SpiralTimelineController.prototype.addListeners = function() {
 
   // Listen for checkbox changes on show-points
   $('#show-points').change(function(e) {
+
     if (e.currentTarget.checked) {
-      $('circle').show();
+      $('circle.datapoints').show();
+      self.showPoints = true;
     }
     else {
-      $('circle').hide();
+      $('circle.datapoints').hide();
+      self.showPoints = false;
+    }
+  });
+  
+  // Listen for checkbox changes on show-testpoints
+  $('#show-testpoints').change(function(e) {
+    if (e.currentTarget.checked) {
+      $('circle.testpoints').show();
+      self.showTestpoints = true;
+      self.drawTestpoints();
+    }
+    else {
+      $('circle.testpoints').hide();
+      self.showTestpoints = false;
     }
   });
 
@@ -552,6 +656,17 @@ strudel.SpiralTimelineController.prototype.addListeners = function() {
     }
 
     self.updatePoints();
+  });
+  
+  // Listen for checkbox changes on lock-testpoints
+  $('#lock-testpoints').change(function(e) {
+    if (e.currentTarget.checked) {
+      self.lockTestpoints = true;
+    }
+    else {
+      self.lockTestpoints = false;
+    }
+
   });
 
   $('#update-color-map').click(function(e) {
@@ -713,27 +828,14 @@ strudel.SpiralTimelineController.prototype.getDataPoints = function (array, key)
   return array;
 };
 
-strudel.SpiralTimelineController.prototype.getPathPoints = function (array, key) {
-
-  for (var i = 0, l = array.length; i < l; i++) {
-    var time = array[i]['time'];
-
-    // retrieve polar coords
-    var polarCoords = this.newDataGenerator(this.zoomRangeStart, this.zoomRangeEnd, this.numRotations, false)(time);
-
-    // append to object
-    array[i]['polarCoords'] = polarCoords;
-
-  }
-
-  return array;
-};
-
-
 /**
  * Assign color meaning based on some data.
  */
 strudel.SpiralTimelineController.prototype.createColorMap = function (array, key) {
+
+    // PMB
+    if (self.colorPoints == false)
+      return;
 
     var uniquePlayers =  _.uniq(_.pluck(array, key));
 
@@ -759,7 +861,6 @@ strudel.SpiralTimelineController.prototype.createColorMap = function (array, key
 };
 
 
-
 /*
  * Prolly could throw this into a utils class if we have more of these.
  */
@@ -774,7 +875,7 @@ strudel.SpiralTimelineController.prototype.slugify = function (text) {
 
 
 strudel.SpiralTimelineController.prototype.setPointColors = function () {
-  var circle = this.svg.selectAll("circle");
+  var circle = this.svg.selectAll("circle.datapoints");
   var self = this;
   var colorMap = this.createColorMap(this.datapoints, 'player');
 
@@ -790,6 +891,7 @@ strudel.SpiralTimelineController.prototype.setPointColors = function () {
 
   }
   else {
+    return;
     circle
       .transition().duration(self.animationInterval)
       .attr('fill', function(d, i) {
@@ -806,12 +908,76 @@ strudel.SpiralTimelineController.prototype.setPointColors = function () {
  */
 strudel.SpiralTimelineController.prototype.updatePointOpacity = function () {
   var self = this;
-  var circle = this.svg.selectAll("circle")
+  var circle = this.svg.selectAll("circle.datapoints")
     .attr('opacity', function(d) {
       return self.pointOpacity;
     });
 };
 
+/**
+ * Update test data points on curve.
+ */
+strudel.SpiralTimelineController.prototype.drawTestpoints = function () {
+  var self = this;
+
+  if (this.showTestpoints == false)
+    return;
+
+  // Total test points to plot is the number of revolutions * number of
+  // test points per revolution
+  var allTestPoints = Math.floor(this.testpoints * this.numRotations);
+  var anglePoints = [];
+  var midPoints = [];
+  
+  for (var n=0; n<allTestPoints; n++) {
+
+    // PMB This is the theta for the angle bisector points
+//    var theta = ((2 * (n+1) - 1) * (Math.PI / this.testpoints);
+    var theta = self.utils.getBisectingTheta(n+1, this.testpoints);
+    var polarCoords = this.newDataGenerator(this.zoomRangeStart, this.zoomRangeEnd, this.numRotations, true)(theta);
+    anglePoints[n] = {'polarCoords': polarCoords, 'color': '#FF0000'};
+
+    var theta = self.utils.getMidpointTheta(n+1, this.zoomRangeStart, this.zoomRangeEnd, this.numRotations, this.testpoints);
+    var polarCoords = this.newDataGenerator(this.zoomRangeStart, this.zoomRangeEnd, this.numRotations, true)(theta);
+    midPoints[n] = {'polarCoords': polarCoords, 'color': '#0000FF'};
+
+  }
+
+  var newPoints = anglePoints.concat(midPoints);
+  this.plotPoints(newPoints, 'testpoints');
+
+};
+
+strudel.SpiralTimelineController.prototype.plotPoints = function (plotData, pointsName) {
+  var self = this;
+  var points = this.svg.selectAll('circle.' + pointsName)
+      .data(plotData);
+
+  points.exit().remove();
+
+  points.enter().append("circle");
+  points.attr('class', pointsName);
+  points.attr('fill', function(d) {
+    return d.color; 
+  });
+  points.attr('stroke-width', 1);
+  points.attr('stroke', "black");
+  points.attr('r', function(d) {
+    return self.pointScale;
+  });
+
+  points 
+      .attr("cx", function (d) { return self.polarToCarX(d); })
+      .attr("cy", function (d) { return self.polarToCarY(d); });
+
+  points.on('click', function() {
+    console.log('cx: ' + $(this).attr('cx') + ', cy: ' + $(this).attr('cy'));
+    var polarCoords = self.utils.cartesianToPolar($(this).attr('cx'), $(this).attr('cy'));
+    console.log('radius: ' + polarCoords['r'] + ", theta: " + polarCoords['theta']);
+//    self.updateTooltip(this, {'player': $(this).attr('player'), 'points': $(this).attr('points')});
+  });
+
+}
 
 /**
  * Update data points on curve.
@@ -819,27 +985,21 @@ strudel.SpiralTimelineController.prototype.updatePointOpacity = function () {
 strudel.SpiralTimelineController.prototype.updatePoints = function () {
   var self = this;
 
+  // PMB
+  this.drawTestpoints();
+
   var points = this.getDataPoints(this.datapoints, 'time');
   var plotData = points;
 
   var colorMap = this.createColorMap(this.datapoints, 'player');
 
-  var polarToCarX = function(d) {
-        var carX = self.graphScale(d['polarCoords'][1]) * Math.cos(-d['polarCoords'][0]);
-        return carX;
-  };
-
-  var polarToCarY = function(d) {
-        var carY = self.graphScale(d['polarCoords'][1]) * Math.sin(-d['polarCoords'][0]);
-        return carY;
-  };
-
-  var circle = this.svg.selectAll("circle")
+  var circle = this.svg.selectAll("circle.datapoints")
       .data(plotData);
 
   circle.exit().remove();
 
   circle.enter().append("circle")
+    .attr('class', 'datapoints')
     .attr('player', function(d) {
       return d['player'];
     })
@@ -863,11 +1023,13 @@ strudel.SpiralTimelineController.prototype.updatePoints = function () {
   }
 
   circle
-      .attr("cx", function (d) { return polarToCarX(d); })
-      .attr("cy", function (d) { return polarToCarY(d); });
+      .attr("cx", function (d) { return self.polarToCarX(d); })
+      .attr("cy", function (d) { return self.polarToCarY(d); });
 
   circle.on('click', function() {
-    console.log('clickerrs');
+    console.log('cx: ' + $(this).attr('cx') + ', cy: ' + $(this).attr('cy'));
+    var polarCoords = self.utils.cartesianToPolar($(this).attr('cx'), $(this).attr('cy'));
+    console.log('radius: ' + polarCoords['r'] + ", theta: " + polarCoords['theta']);
     self.updateTooltip(this, {'player': $(this).attr('player'), 'points': $(this).attr('points')});
   });
 
@@ -880,7 +1042,7 @@ strudel.SpiralTimelineController.prototype.updateTooltip = function(el, data) {
   $('.tooltip').empty();
   var tooltipDetails = $('<div class="tooltip-player">Player: ' + data['player'] + '</div>' +
                   '<div class="tooltip-points">Points: ' + data['points'] + '</div>');
-  console.log(tooltipDetails)
+  //console.log(tooltipDetails)
   $('.tooltip').append(tooltipDetails);
 };
 

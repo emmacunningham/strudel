@@ -109,6 +109,7 @@ strudel.MathUtils.prototype.getC = function(o, w, l, bigP) {
  * @return {Number} - bigP?
  */
 strudel.MathUtils.prototype.getBigP = function(p, l, w) {
+
   return (2 * Math.exp(p * (l - w))) - Math.exp(l * p) - 1 /
          (2 * Math.exp(w * p) - Math.exp(l * p) - 1);
 };
@@ -135,6 +136,30 @@ strudel.MathUtils.prototype.getRadius = function(theta, d, v, l) {
 
 };
 
+strudel.MathUtils.prototype.getBisectingTheta = function(n, testpointsPerRotation) {
+  return ((2 * n) - 1) * (Math.PI / testpointsPerRotation);
+}
+  
+var r = function(n, s, c, o, p, l) {
+  return ((Math.exp(((n/s)-c)/o) + Math.exp(p*(l-(n/s)))) / (Math.exp(((n/s)-c)/o) + 1)) * ((l*(Math.exp(p*(n/s)) - 1)) / (Math.exp(l*p) - 1));
+}
+
+strudel.MathUtils.prototype.getMidpointTheta = function(n, d, v, l, s) {
+  var z = this.getZ(d, v, l);
+  var p = this.getP(z, d, v);
+  var w = this.getW(d, v);
+  var bigP = this.getBigP(p, l, w);
+  var o = this.getO(d, v);
+  var c = this.getC(o, w, l, bigP);
+
+  var A = r(n, s, c, o, p, l);
+
+  var B = r((n-1), s, c, o, p, l);
+
+  var theta = (2*Math.PI * (n/s)) - Math.acos((A+(B*Math.cos((2*Math.PI)/s))) / Math.sqrt(Math.pow(A,2) + Math.pow(B,2) + 2*A*B*Math.cos((2*Math.PI)/s)));
+
+  return theta;
+}
 
 /**
  * Determines the radius value necessary to
@@ -193,24 +218,6 @@ strudel.MathUtils.prototype.getPathRadius = function(theta, d, v, l, res) {
   var Y = (leftCartesian['y'] - (leftCartesian['x'] * segSlope)) / (1 - ((circleCartesian['x'] / circleCartesian['y']) * segSlope));
 
   var targetPolar = this.cartesianToPolar(X, Y);
-/*
-  if (isNaN(targetPolar['r'])) {
-    verbose = true;
-    log("snapped radius is NaN for theta " + theta + ", d " + d + ", v " + v + ", rotations " + l + ", resolution " + res);
-    log("circle radius: " + circleRadius + ", circle theta: " + theta);
-    log("circle X: " + circleCartesian['x'] + ", Y: " + circleCartesian['y']);
-    log("binSize is " + binSize);
-    log("leftBin is " + leftBin + ", rightBin is " + rightBin);
-    log("left radius: " + leftRadius + ", left theta: " + leftTheta);
-    log("right radius: " + rightRadius + ", right theta: " + rightTheta);
-    log("left X: " + leftCartesian['x'] + ", Y: " + leftCartesian['y']);
-    log("right X: " + rightCartesian['x'] + ", Y:" + rightCartesian['y']);
-    log("intersection X: " + X + ", Y: " + Y);
-  log("original theta: " + theta + ", target theta: " + targetPolar['theta']);
-  log("target radius: " + targetPolar['r']);
-    verbose = false;
-  }
-*/
   return targetPolar['r'];
 
 };
