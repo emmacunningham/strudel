@@ -1,5 +1,3 @@
-@import url(http://fonts.googleapis.com/css?family=Alegreya+Sans+SC:100,300,400,500,700,100italic,300italic,400italic,500italic,700italic);
-
 body {
   font-family: 'Alegreya Sans SC', sans-serif;
   margin: 0;
@@ -20,7 +18,7 @@ html, body {
 
 /* Temp styles for ui stuff */
 .menu-toggle {
-  background-image: url('https://cdn4.iconfinder.com/data/icons/basic-ui-elements/700/06_menu_stack-512.png');
+  background-image: url('../img/06_menu_stack-512.png');
   width: 50px;
   height: 50px;
   background-size: 90%;
@@ -78,7 +76,7 @@ html, body {
 }
 
 .menu-active .options-container {
-  max-width: 400px;
+  max-width: 275px;
   background: #ececec;
 }
 
@@ -99,7 +97,7 @@ html, body {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  background-image: url('http://r.fod4.com/c=sq/s=w1000,pd1/o=80/http://p.fod4.com/p/channels/gaiga/profile/s=w1200/o=95/ArE6m3YQVW5prtNbf44t_deandre_jordan.jpg');
+  background-image: url('../img/ArE6m3YQVW5prtNbf44t_deandre_jordan.jpg');
 }
 
 /* Graph styles */
