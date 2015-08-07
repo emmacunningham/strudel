@@ -215,6 +215,17 @@ strudel.SpiralTimelineController = function(params) {
   };
 
   /**
+   * Custom polar-to-Cartesian conversion function for the 
+   * spiral doman, returning both X and Y coordinates
+   * @type {function}
+   */
+  this.polarToCar = function(d) {
+    var carX = this.polarToCarX(d);
+    var carY = this.polarToCarY(d);
+    return [carX, carY];
+  };
+
+  /**
    * Function constraining domain and range of graph to fit within
    * graph container dimensions.
    * @type {function}
@@ -642,6 +653,7 @@ strudel.SpiralTimelineController.prototype.addListeners = function() {
     }
     else {
       $('circle.testpoints').hide();
+      self.svg.selectAll("#delaunay").remove(); 
       self.showTestpoints = false;
     }
   });
@@ -928,6 +940,7 @@ strudel.SpiralTimelineController.prototype.drawTestpoints = function () {
   var allTestPoints = Math.floor(this.testpoints * this.numRotations);
   var anglePoints = [];
   var midPoints = [];
+  var cartesianMidpoints = [];
   
   for (var n=0; n<allTestPoints; n++) {
 
@@ -939,13 +952,32 @@ strudel.SpiralTimelineController.prototype.drawTestpoints = function () {
 
     var theta = self.utils.getMidpointTheta(n+1, this.zoomRangeStart, this.zoomRangeEnd, this.numRotations, this.testpoints);
     var polarCoords = this.newDataGenerator(this.zoomRangeStart, this.zoomRangeEnd, this.numRotations, true)(theta);
+
     midPoints[n] = {'polarCoords': polarCoords, 'color': '#0000FF'};
+
+    // Keep track of the midpoints in Cartesian for plotting Delaunay triangles
+    cartesianMidpoints.push(self.polarToCar({'polarCoords': polarCoords}));
 
   }
 
   var newPoints = anglePoints.concat(midPoints);
   this.plotPoints(newPoints, 'testpoints');
 
+  /* Plot the mesh of Delaunay triangles built around the section midpoints */
+  var delaunayPoints = d3.geom.delaunay(cartesianMidpoints);
+  
+  this.svg.selectAll("#delaunay").remove(); 
+
+  var delaunayPath = this.svg.selectAll("delaunay")
+    .data(delaunayPoints);
+
+  delaunayPath.enter().append("path")
+    .attr("class", function(d, i) { return "q" + (i % 9) + "-9"; })
+    .attr("id", "delaunay")
+    .attr("fill", "none")
+    .attr("stroke", "black")
+    .attr("d", function(d) { return "M" + d.join("L") + "Z"; });
+    
 };
 
 strudel.SpiralTimelineController.prototype.plotPoints = function (plotData, pointsName) {
@@ -972,8 +1004,6 @@ strudel.SpiralTimelineController.prototype.plotPoints = function (plotData, poin
 
   points.on('click', function() {
     console.log('cx: ' + $(this).attr('cx') + ', cy: ' + $(this).attr('cy'));
-    var polarCoords = self.utils.cartesianToPolar($(this).attr('cx'), $(this).attr('cy'));
-    console.log('radius: ' + polarCoords['r'] + ", theta: " + polarCoords['theta']);
 //    self.updateTooltip(this, {'player': $(this).attr('player'), 'points': $(this).attr('points')});
   });
 
@@ -985,14 +1015,49 @@ strudel.SpiralTimelineController.prototype.plotPoints = function (plotData, poin
 strudel.SpiralTimelineController.prototype.updatePoints = function () {
   var self = this;
 
-  // PMB
   this.drawTestpoints();
-
+  
   var points = this.getDataPoints(this.datapoints, 'time');
   var plotData = points;
 
   var colorMap = this.createColorMap(this.datapoints, 'player');
+  
+  // PMB -- test code for drawing barlines instead of points for data
+  // Needs a lot of work
+/*
+  this.svg.selectAll("#datalines").remove(); 
 
+  var point = this.svg.selectAll("dataline")
+    .data(plotData);
+
+  console.log("Running updatePoints");
+
+  point.enter().append("line")
+    .attr("id", "datalines")
+    .attr("class", "dataline")
+    .attr("x1", function (d) { return self.polarToCarX(d); })
+    .attr("y1", function (d) { return self.polarToCarY(d); })
+    .attr("x2", function (d) {
+      var length = d['points'] * self.pointScale / self.numRotations;
+      d['polarCoords'][1] = d['polarCoords'][1] + length;
+      return self.polarToCarX(d); 
+    })
+    .attr("y2", function (d) {
+      var length = d['points'] * self.pointScale / self.numRotations;
+      d['polarCoords'][1] = d['polarCoords'][1] + length;
+      return self.polarToCarY(d);
+    })
+    .attr("stroke-width", 2)
+//    .attr("stroke", "black");
+    .attr('stroke', function(d) {
+      console.log("computing line color");
+      var playerSlug = self.slugify(d['player']);
+      var color = colorMap[playerSlug];
+      return color;
+    }); 
+
+  return;  
+*/
   var circle = this.svg.selectAll("circle.datapoints")
       .data(plotData);
 
@@ -1028,8 +1093,6 @@ strudel.SpiralTimelineController.prototype.updatePoints = function () {
 
   circle.on('click', function() {
     console.log('cx: ' + $(this).attr('cx') + ', cy: ' + $(this).attr('cy'));
-    var polarCoords = self.utils.cartesianToPolar($(this).attr('cx'), $(this).attr('cy'));
-    console.log('radius: ' + polarCoords['r'] + ", theta: " + polarCoords['theta']);
     self.updateTooltip(this, {'player': $(this).attr('player'), 'points': $(this).attr('points')});
   });
 
@@ -1040,8 +1103,7 @@ strudel.SpiralTimelineController.prototype.updatePoints = function () {
  */
 strudel.SpiralTimelineController.prototype.updateTooltip = function(el, data) {
   $('.tooltip').empty();
-  var tooltipDetails = $('<div class="tooltip-player">Player: ' + data['player'] + '</div>' +
-                  '<div class="tooltip-points">Points: ' + data['points'] + '</div>');
+  var tooltipDetails = $('<div class="tooltip-player">Player: ' + data['player'] + '</div>' + '<div class="tooltip-points">Points: ' + data['points'] + '</div>');
   //console.log(tooltipDetails)
   $('.tooltip').append(tooltipDetails);
 };

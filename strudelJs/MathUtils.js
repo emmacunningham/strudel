@@ -140,11 +140,12 @@ strudel.MathUtils.prototype.getBisectingTheta = function(n, testpointsPerRotatio
   return ((2 * n) - 1) * (Math.PI / testpointsPerRotation);
 }
   
-var r = function(n, s, c, o, p, l) {
-  return ((Math.exp(((n/s)-c)/o) + Math.exp(p*(l-(n/s)))) / (Math.exp(((n/s)-c)/o) + 1)) * ((l*(Math.exp(p*(n/s)) - 1)) / (Math.exp(l*p) - 1));
-}
-
 strudel.MathUtils.prototype.getMidpointTheta = function(n, d, v, l, s) {
+
+  var r = function(n, s, c, o, p, l) {
+    return ((Math.exp(((n/s)-c)/o) + Math.exp(p*(l-(n/s)))) / (Math.exp(((n/s)-c)/o) + 1)) * ((l*(Math.exp(p*(n/s)) - 1)) / (Math.exp(l*p) - 1));
+  }
+
   var z = this.getZ(d, v, l);
   var p = this.getP(z, d, v);
   var w = this.getW(d, v);
@@ -221,8 +222,6 @@ strudel.MathUtils.prototype.getPathRadius = function(theta, d, v, l, res) {
   return targetPolar['r'];
 
 };
-
-/* Maybe these two functions should be math utilities */
 
 strudel.MathUtils.prototype.polarToCartesian = function(radius, theta) {
 
