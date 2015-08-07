@@ -653,7 +653,7 @@ strudel.SpiralTimelineController.prototype.addListeners = function() {
     }
     else {
       $('circle.testpoints').hide();
-      self.svg.selectAll("#delaunay").remove(); 
+      self.svg.selectAll("#voronoi").remove(); 
       self.showTestpoints = false;
     }
   });
@@ -963,21 +963,20 @@ strudel.SpiralTimelineController.prototype.drawTestpoints = function () {
   var newPoints = anglePoints.concat(midPoints);
   this.plotPoints(newPoints, 'testpoints');
 
-  /* Plot the mesh of Delaunay triangles built around the section midpoints */
-  var delaunayPoints = d3.geom.delaunay(cartesianMidpoints);
+  var voronoiPoints = d3.geom.voronoi(cartesianMidpoints);
   
-  this.svg.selectAll("#delaunay").remove(); 
+  this.svg.selectAll("#voronoi").remove(); 
 
-  var delaunayPath = this.svg.selectAll("delaunay")
-    .data(delaunayPoints);
+  var voronoiPath = this.svg.selectAll("voronoi")
+    .data(voronoiPoints);
 
-  delaunayPath.enter().append("path")
+  voronoiPath.enter().append("path")
     .attr("class", function(d, i) { return "q" + (i % 9) + "-9"; })
-    .attr("id", "delaunay")
+    .attr("id", "voronoi")
     .attr("fill", "none")
     .attr("stroke", "black")
     .attr("d", function(d) { return "M" + d.join("L") + "Z"; });
-    
+
 };
 
 strudel.SpiralTimelineController.prototype.plotPoints = function (plotData, pointsName) {
