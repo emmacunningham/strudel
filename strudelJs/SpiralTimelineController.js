@@ -389,13 +389,29 @@ strudel.SpiralTimelineController.prototype.updateZoomSlider = function() {
  */
 strudel.SpiralTimelineController.prototype.updateResolution = function(n) {
 
-  // adjust the text on the range slider
-  d3.select("#res-value").text(n);
-  d3.select("#resolutionSlider").property("value", n);
+  var logRes = Math.log2(n);
 
+  // adjust the text on the range slider
+  d3.select("#res-value").text(n.toFixed(1));
+  d3.select("#resolutionSlider").property("value", n);
+  
   this.resolution = n;
 
   this.updatePath();
+
+};
+
+/**
+ * Update the log (base 2) of the resolution, for display purposes 
+ * @param {Number} n - resolution (base 10).
+ */
+strudel.SpiralTimelineController.prototype.updateLogResolution = function(n) {
+
+  var logRes = Math.log2(n);
+
+  // adjust the text on the range slider
+  d3.select("#log-res-value").text(logRes.toFixed(1));
+  d3.select("#logResolutionSlider").property("value", logRes);
 
 };
 
@@ -405,10 +421,8 @@ strudel.SpiralTimelineController.prototype.updateResolution = function(n) {
  */
 strudel.SpiralTimelineController.prototype.updateTestpoints = function(n) {
 
-  var intN = Math.floor(n);
-
   // adjust the text on the range slider
-  d3.select("#testpoints-value").text(n);
+  d3.select("#testpoints-value").text(n.toFixed(1));
   d3.select("#testpointsSlider").property("value", n);
 
   this.testpoints = n;
@@ -472,6 +486,7 @@ strudel.SpiralTimelineController.prototype.initSliders = function() {
 
   this.updateRotations(this.numRotations);
   this.updateResolution(this.resolution);
+  this.updateLogResolution(this.resolution);
   this.updateTestpoints(this.testpoints);
   this.updatePathWeight(this.pathWeight);
 
@@ -544,10 +559,26 @@ strudel.SpiralTimelineController.prototype.addListeners = function() {
   // Select the <input> rotation element and attaches a listener to when the input
   // value changes.  On input change, call "updateResolution" function with the new value.
   d3.select("#resolutionSlider").on("input", function() {
+
     self.updateResolution(+Number(this.value));
+    self.updateLogResolution(+Number(this.value));
 
     if (self.lockTestpoints == true) {
       self.updateTestpoints(+Number(this.value));      
+    }
+
+  });
+  
+  // Update the logarithmic (base 2) resoluton slider. On input change, 
+  // the appropriate update functions with the new value.
+  d3.select("#logResolutionSlider").on("input", function() {
+    var expValue = Math.pow(2, +Number(this.value));
+
+    self.updateLogResolution(+expValue);      
+    self.updateResolution(+expValue);
+
+    if (self.lockTestpoints == true) {
+      self.updateTestpoints(+expValue);      
     }
 
   });
@@ -559,6 +590,7 @@ strudel.SpiralTimelineController.prototype.addListeners = function() {
     
     if (self.lockTestpoints == true) {
       self.updateResolution(+Number(this.value));      
+      self.updateLogResolution(+Number(this.value));      
     }
 
   });
