@@ -138,7 +138,7 @@ strudel.MathUtils.prototype.getRadius = function(theta, d, v, l) {
 
 strudel.MathUtils.prototype.getBisectingTheta = function(n, testpointsPerRotation) {
   return ((2 * n) - 1) * (Math.PI / testpointsPerRotation);
-}
+};
   
 strudel.MathUtils.prototype.getMidpointTheta = function(n, d, v, l, s) {
 
@@ -160,7 +160,7 @@ strudel.MathUtils.prototype.getMidpointTheta = function(n, d, v, l, s) {
   var theta = (2*Math.PI * (n/s)) - Math.acos((A+(B*Math.cos((2*Math.PI)/s))) / Math.sqrt(Math.pow(A,2) + Math.pow(B,2) + 2*A*B*Math.cos((2*Math.PI)/s)));
 
   return theta;
-}
+};
 
 /**
  * Determines the radius value necessary to
@@ -223,15 +223,23 @@ strudel.MathUtils.prototype.getPathRadius = function(theta, d, v, l, res) {
 
 };
 
+/* This function often isn't as useful as the polarToCarX/Y functions
+ * above for the spiral timeline because it does not take into account
+ * the zoom settings, but it is used in a few of the math functions aobve.
+ */
 strudel.MathUtils.prototype.polarToCartesian = function(radius, theta) {
-
   // Note that theta is negative, to make sure the spiral is rotated correctly
   return { "x": (radius * Math.cos(-theta)), "y": (radius * Math.sin(-theta)) };
-
 };
 
 strudel.MathUtils.prototype.cartesianToPolar = function(x, y) {
-
   return { "r": (Math.sqrt(Math.pow(x,2) + Math.pow(y,2))), "theta": (Math.atan2(y,x)) };
+};
 
+/* These functions really should be built in to Javascript */
+strudel.MathUtils.prototype.getMinOfArray = function(numArray) {
+  return Math.min.apply(null, numArray);
+};
+strudel.MathUtils.prototype.getMaxOfArray = function(numArray) {
+  return Math.max.apply(null, numArray);
 };

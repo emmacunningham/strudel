@@ -32,14 +32,14 @@
                resolution = <span id="res-value">…</span>
         </label><br>
 
-        <input type="range" min="2" max="64" id="resolutionSlider" step=".5">
+        <input type="range" min="2" max="64" id="resolutionSlider" step=".1">
         
         <br> 
         <label for="log_res">
                log resolution = <span id="log-res-value">…</span>
         </label><br>
 
-        <input type="range" min="2" max="6" id="logResolutionSlider" step=".1">
+        <input type="range" min="1" max="6" id="logResolutionSlider" step=".1">
 
         <br> 
         <label for="testpoints_slider">
@@ -140,8 +140,6 @@
         <input type="range" min="0" max="100" value="0" id="bg-distance" step="1">
       </div>
 
-
-
         <!-- Old range zoom sliders can get fucked.
         <label for="d"
                style="display: inline-block; width: 240px; text-align: right">
@@ -165,7 +163,6 @@
     </div>
   </div>
 
-
   <script type="text/javascript" src="lib/jquery-2.1.3.min.js"></script>
   <script type="text/javascript" src="lib/colpick/js/colpick.js"></script>
 
@@ -177,23 +174,29 @@
   <script src="lib/lodash.min.js"></script>
 
 <!-- old shit
-
   <script type="text/javascript" src="rangeZoomSpiral.js"></script>
 -->
   <script type="text/javascript" src="strudelJs/MathUtils.js"></script>
   <script type="text/javascript" src="strudelJs/ui/ZoomRangeSlider.js"></script>
+  <!-- Data handlers go here - we can have as many as we want, probably -->
+  <script type="text/javascript" src="strudelJs/dataHandlers/WaterTempData.js"></script>
   <script type="text/javascript" src="strudelJs/dataHandlers/ClipsSample.js"></script>
-
   <script type="text/javascript" src="strudelJs/SpiralTimelineController.js"></script>
 
   <script>
-    var spiral = new strudel.SpiralTimelineController();
-    var dataHandler = new strudel.dataHandlers.ClipsSample();
 
-    $.ajax('data/clips_sample.json').success(function(result) {
+    /* PMB: I had to move all of the interface-building code into the Ajax
+     * handler due to dependency issues. This probably isn't ideal...
+     */ 
+    $.ajax('data/daily_water_temp.json').success(function(result) {
+//    $.ajax('data/clips_sample.json').success(function goTimeline(result)  {
 
+      var dataHandler = new strudel.dataHandlers.WaterTempData();
+//      var dataHandler = new strudel.dataHandlers.ClipsSample();
+      var spiral = new strudel.SpiralTimelineController();
       var data = dataHandler.processData(result);
       spiral.updateData(data);
+      spiral.init();
       spiral.setPointColors();
     });
 

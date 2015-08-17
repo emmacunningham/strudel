@@ -35,7 +35,6 @@ strudel.dataHandlers.ClipsSample.prototype.processData = function(data) {
   for (var i = 0, l = ids_array.length; i < l; i++) {
     var game = _.filter(this.rawData, { 'game_id': ids_array[i] });
     games_array.push(game);
-
   }
 
   var processed_games_data = [];
@@ -54,21 +53,27 @@ strudel.dataHandlers.ClipsSample.prototype.processData = function(data) {
   }
 
   // Now create the final array.
-  var result = [];
-  for (var i = 0, l = processed_games_data.length; i < l; i++) {
+  var result = {};
+  result['points'] = [];
+  result['attributes'] = {};
+  // PMB: Other ideas for point attributes: opacityVar, strokeVar
+  // Also could specify the colormap parameters here somehow
+  result.attributes['timeSeries'] = {'label': 'time', 'type': 'recurrent', 'unitsPerRotation': 48};
+  result.attributes['colorVar'] = {'label': 'player'};
+  result.attributes['sizeVar'] = {'label': 'points', 'maxSize': 9};
+  result.attributes['tooltipLabels'] = ['player', 'points'];
+  for (var i = 0; i < processed_games_data.length; i++) {
     var rotation_id = processed_games_data[i].rotation_id;
     var time = processed_games_data[i].time + (rotation_id * 48);
-    var spiralized_time = (time/48) * 2 * Math.PI;
     var instance = {
-      'time': spiralized_time,
+      'time': time,
       'team': processed_games_data[i]['team'],
       'player': processed_games_data[i]['player'],
       'points': processed_games_data[i]['points']
     };
-    result.push(instance);
+    result.points.push(instance);
   }
 
   //this.processedData = result;
   return result;
 };
-
