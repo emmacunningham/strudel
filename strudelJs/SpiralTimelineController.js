@@ -31,7 +31,7 @@ strudel.SpiralTimelineController = function(params) {
    * Number of rotations around the origin.
    * @type {Number}
    */
-  this.numRotations = 15;
+  this.numRotations = 14.6;
 
   /**
    * Degree of rotations around the origin.
