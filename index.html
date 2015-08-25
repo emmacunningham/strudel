@@ -25,7 +25,7 @@
         Path options
       </div>
       <div class="option-set" id="path-options">
-        <input id="show-line" type="checkbox" name="show-line" value="show-line" checked> <label>Show line</label> <br />
+        <input id="show-line" type="checkbox" name="show-line" value="show-line" checked> <label>Show path</label> <br />
         <input id="lock-testpoints" type="checkbox" name="lock-testpoints-line" value="lock-testpoints" checked> <label>Lock test points to res</label> <br />
         
         <label for="res">
@@ -104,6 +104,16 @@
           point size
         </label><br/>
         <input type="range" min="0" max="10" value="3" id="point-scale" step="0.25"><br>
+        
+        <label for="sliver-q">
+          Sliver q = <span id="sliver-q-value">…</span>
+        </label><br/>
+        <input type="range" min="0" max=".052" value=".0086" id="sliver-q" step="0.0001"><br>
+
+        <label for="sliver-phi">
+          Sliver φ = <span id="sliver-phi-value">…</span>
+        </label><br/>
+        <input type="range" min="0" max="3.14" value="1.6" id="sliver-phi" step="0.1"><br>
 
         <input id="show-points" type="checkbox" name="show-points" value="show-points" checked> <label>Show data points</label><br/>
         <input id="show-testpoints" type="checkbox" name="show-testpoints" value="show-testpoints"> <label>Show test points</label><br/>

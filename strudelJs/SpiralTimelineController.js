@@ -63,6 +63,9 @@ strudel.SpiralTimelineController = function(params) {
    */
   this.testpoints = 12;
 
+  this.sliverQ = .0086;
+  this.sliverPhi = 1.6;
+
   /**
    * Weight of the stroke used to draw the curve.
    * @type {Number}
@@ -197,7 +200,7 @@ strudel.SpiralTimelineController = function(params) {
    * @type {function}
    */
   this.polarToCarX = function(d) {
-    var carX = self.graphScale(d['polarCoords'][1]) * Math.cos(-d['polarCoords'][0]);
+    var carX = self.graphScale(d['polarCoords'][0]) * Math.cos(-d['polarCoords'][1]);
     return carX;
   };
   
@@ -207,7 +210,7 @@ strudel.SpiralTimelineController = function(params) {
    * @type {function}
    */
   this.polarToCarY = function(d) {
-    var carY = self.graphScale(d['polarCoords'][1]) * Math.sin(-d['polarCoords'][0]);
+    var carY = self.graphScale(d['polarCoords'][0]) * Math.sin(-d['polarCoords'][1]);
     return carY;
   };
 
@@ -255,10 +258,10 @@ strudel.SpiralTimelineController = function(params) {
    */
   this.line = d3.svg.line.radial()
       .radius(function(data) {
-        return self.graphScale(data[1]);
+        return self.graphScale(data[0]);
       })
       .angle(function(data) {
-        return Math.PI / 2 - data[0];
+        return Math.PI / 2 - data[1];
       });
 
   /**
@@ -689,6 +692,7 @@ strudel.SpiralTimelineController.prototype.addListeners = function() {
     else {
       $('circle.testpoints').hide();
       self.svg.selectAll("#voronoi").remove(); 
+      self.svg.selectAll("#slivers").remove(); 
       self.showTestpoints = false;
     }
   });
@@ -723,6 +727,18 @@ strudel.SpiralTimelineController.prototype.addListeners = function() {
   d3.select("#bg-opacity").on("input", function() {
     self.bgOpacity = Number(this.value);
     self.updateBackground();
+  });
+  
+  d3.select("#sliver-q").on("input", function() {
+    self.sliverQ = Number(this.value);
+    d3.select("#sliver-q-value").text(this.value);
+    self.updatePoints();
+  });
+  
+  d3.select("#sliver-phi").on("input", function() {
+    self.sliverPhi = Number(this.value);
+    d3.select("#sliver-phi-value").text(this.value);
+    self.updatePoints();
   });
 
   d3.select("#point-opacity").on("input", function() {
@@ -819,14 +835,14 @@ strudel.SpiralTimelineController.prototype.newDataGenerator = function(zoomRange
 
   if (this.snapPoints == false) {
     var spiralDataGenerator = function(theta) {
-      return [theta, self.utils.getRadius(theta, zoomRangeStart, zoomRangeEnd, l)];
+      return [self.utils.getRadius(theta, zoomRangeStart, zoomRangeEnd, l), theat];
     };
   } else {
     var spiralDataGenerator = function(theta) {
       if (isData == false) {
-        return [theta, self.utils.getRadius(theta, zoomRangeStart, zoomRangeEnd, l)];
+        return [self.utils.getRadius(theta, zoomRangeStart, zoomRangeEnd, l), theta];
       } else {
-        return [theta, self.utils.getPathRadius(theta, zoomRangeStart, zoomRangeEnd, l, self.resolution)];
+        return [self.utils.getPathRadius(theta, zoomRangeStart, zoomRangeEnd, l, self.resolution), theta];
       }
     };
   }
@@ -874,6 +890,7 @@ strudel.SpiralTimelineController.prototype.getDataPoints = function (array, key)
     var polarCoords = this.newDataGenerator(this.zoomRangeStart, this.zoomRangeEnd, this.numRotations, true)(spiralizedTime);
 
     // append to object
+    // The polarCoords order should always be [radius, theta]
     array[i]['polarCoords'] = polarCoords;
 
   }
@@ -1023,6 +1040,59 @@ strudel.SpiralTimelineController.prototype.drawTestpoints = function () {
   var newPoints = anglePoints.concat(midPoints);
   this.plotPoints(newPoints, 'testpoints');
 
+  var envelopePoints = [];
+
+  var sliverPhi = this.sliverPhi;
+  var sliverQ = this.sliverQ;
+
+  for (var e=0; e<newPoints.length; e++) {
+    var pointRadius = newPoints[e]['polarCoords'][0];
+    var pointTheta = newPoints[e]['polarCoords'][1];
+    
+    var aRadius = self.utils.getRadius((pointTheta + sliverQ + sliverPhi), this.zoomRangeStart, this.zoomRangeEnd, this.numRotations);
+    var aTheta = pointTheta + sliverQ;
+    envelopePoints.push(self.polarToCar({'polarCoords': [aRadius, aTheta]}));
+    var bRadius = self.utils.getRadius((pointTheta - sliverQ + sliverPhi), this.zoomRangeStart, this.zoomRangeEnd, this.numRotations);
+    var bTheta = pointTheta - sliverQ;
+    envelopePoints.push(self.polarToCar({'polarCoords': [bRadius, bTheta]}));
+    var cRadius = self.utils.getRadius((pointTheta - sliverQ - sliverPhi), this.zoomRangeStart, this.zoomRangeEnd, this.numRotations);
+    var cTheta = pointTheta - sliverQ;
+    envelopePoints.push(self.polarToCar({'polarCoords': [cRadius, cTheta]}));
+    var dRadius = self.utils.getRadius((pointTheta + sliverQ - sliverPhi), this.zoomRangeStart, this.zoomRangeEnd, this.numRotations);
+    var dTheta = pointTheta + sliverQ;
+    envelopePoints.push(self.polarToCar({'polarCoords': [dRadius, dTheta]}));
+  }
+
+//  console.log(envelopePoints);
+
+//  var sliversPath = this.svg.selectAll("#slivers");
+  this.svg.selectAll("#slivers").remove(); 
+  var sliversPoints = this.svg.selectAll("#slivers")
+    .data(envelopePoints);
+
+//  sliversPath.remove();
+/*
+  var sliversPath = this.svg.selectAll("slivers")
+    .data(envelopePoints);
+  var lineFunction = d3.svg.line()
+       .x(function(d) { return d[0]; })
+          .y(function(d) { return d[1]; })
+             .interpolate("basis"); 
+*/
+  sliversPoints.enter().append("circle")
+   .attr('id', "slivers")
+   .attr('stroke-width', 1)
+   .attr('stroke', "black")
+   .attr('r', 1)
+   .attr("cx", function (d) { return d[0]; })
+   .attr("cy", function (d) { return d[1]; });
+
+/*   .attr("id", "slivers")
+    .attr("fill", "none")
+    .attr("stroke", "black")
+    .attr("points", envelopePoints); */
+
+/*
   var voronoiPoints = d3.geom.voronoi(cartesianMidpoints);
   
   this.svg.selectAll("#voronoi").remove(); 
@@ -1036,7 +1106,7 @@ strudel.SpiralTimelineController.prototype.drawTestpoints = function () {
     .attr("fill", "none")
     .attr("stroke", "black")
     .attr("d", function(d) { return "M" + d.join("L") + "Z"; });
-
+*/
 };
 
 strudel.SpiralTimelineController.prototype.plotPoints = function (plotData, pointsName) {
@@ -1104,12 +1174,12 @@ strudel.SpiralTimelineController.prototype.updatePoints = function () {
     .attr("y1", function (d) { return self.polarToCarY(d); })
     .attr("x2", function (d) {
       var length = d['points'] * self.pointScale / self.numRotations;
-      d['polarCoords'][1] = d['polarCoords'][1] + length;
+      d['polarCoords'][0] = d['polarCoords'][0] + length;
       return self.polarToCarX(d); 
     })
     .attr("y2", function (d) {
       var length = d['points'] * self.pointScale / self.numRotations;
-      d['polarCoords'][1] = d['polarCoords'][1] + length;
+      d['polarCoords'][0] = d['polarCoords'][0] + length;
       return self.polarToCarY(d);
     })
     .attr("stroke-width", 2)
