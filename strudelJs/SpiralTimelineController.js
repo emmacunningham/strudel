@@ -1036,7 +1036,7 @@ strudel.SpiralTimelineController.prototype.drawTestpoints = function () {
   // test points per revolution
   var allTestPoints = Math.floor(this.testpoints * this.numRotations);
   var anglePoints = [];
-  var midPoints = [];
+  var newPoints = [];
   var cartesianMidpoints = [];
   
   for (var n=0; n<allTestPoints; n++) {
@@ -1050,14 +1050,14 @@ strudel.SpiralTimelineController.prototype.drawTestpoints = function () {
     var theta = self.utils.getMidpointTheta(n+1, this.zoomRangeStart, this.zoomRangeEnd, this.numRotations, this.testpoints);
     var polarCoords = this.newDataGenerator(this.zoomRangeStart, this.zoomRangeEnd, this.numRotations, true)(theta);
 
-    midPoints[n] = {'polarCoords': polarCoords, 'color': '#0000FF'};
+    newPoints[n] = {'polarCoords': polarCoords, 'color': '#0000FF'};
 
     // Keep track of the midpoints in Cartesian for plotting Delaunay triangles
     cartesianMidpoints.push(self.polarToCar({'polarCoords': polarCoords}));
 
   }
 
-  var newPoints = anglePoints.concat(midPoints);
+//  var newPoints = anglePoints.concat(midPoints);
   this.plotPoints(newPoints, 'testpoints');
 
   var envelopes = [];
