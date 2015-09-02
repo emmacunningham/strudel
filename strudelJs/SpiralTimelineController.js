@@ -95,7 +95,7 @@ strudel.SpiralTimelineController = function(params) {
    * Whether to display the test points.
    * @type {boolean}
    */
-  this.showTestpoints = false;
+  this.showTestpoints = true;
 
   /**
    * Whether to display the path of the spiral.
