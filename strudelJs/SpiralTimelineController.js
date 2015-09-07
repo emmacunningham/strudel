@@ -31,7 +31,7 @@ strudel.SpiralTimelineController = function(params) {
    * Number of rotations around the origin.
    * @type {Number}
    */
-  this.numRotations = 14.6;
+  this.numRotations = 3;
 
   /**
    * Degree of rotations around the origin.
@@ -55,7 +55,7 @@ strudel.SpiralTimelineController = function(params) {
    * Number of path points per rotation of the spiral
    * @type {Number}
    */
-  this.resolution = 12;
+  this.resolution = 24;
 
   /**
    * Default number of test points per rotation of the spiral

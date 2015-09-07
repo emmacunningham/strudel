@@ -58,18 +58,24 @@ strudel.dataHandlers.IgStream.prototype.processData = function(data) {
 
   var flatData = _.flatten(data);
   var result = {};
+
+  // Units Per Rotation per view:
+  // 31556900 annual
+  // 86400 daily
+
   //console.log(flatData);
   result['points'] = [];
   result['attributes'] = {};
   result.attributes['colorVar'] = {'label': 'temp', 'lowColor': 'blue', 'highColor': 'red'};
   result.attributes['tooltipLabels'] = ['date', 'temp'];
-  result.attributes['timeSeries'] = {'label': 'time', 'type': 'calendrical', 'unitsPerRotation': 31556900};
+  result.attributes['timeSeries'] = {'label': 'time', 'type': 'calendrical', 'unitsPerRotation': 86400};
 
-  // Not sure what multiplied we'll need, toolin around
-  var start_time = flatData[0]['created_time'] * 1000;
+  // Not sure what multiplier we'll need, toolin around
+  var start_time = flatData[flatData.length - 1]['created_time'];
 
-  for (var i = 0; i < 500; i++) {
-    var time = start_time - flatData[i]['created_time'] * 1000;
+  for (var i = 0; i < flatData.length; i++) {
+    var time = (start_time - flatData[i]['created_time']) * -1;
+    console.log(time);
     var caption;
     if (!!flatData[i]['caption'] ) {
       caption = flatData[i]['caption']['text'];
