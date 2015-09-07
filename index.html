@@ -27,21 +27,21 @@
       <div class="option-set" id="path-options">
         <input id="show-line" type="checkbox" name="show-line" value="show-line" checked> <label>Show path</label> <br />
         <input id="lock-testpoints" type="checkbox" name="lock-testpoints-line" value="lock-testpoints" checked> <label>Lock test points to res</label> <br />
-        
+
         <label for="res">
                resolution = <span id="res-value">…</span>
         </label><br>
 
         <input type="range" min="2" max="64" id="resolutionSlider" step=".1">
-        
-        <br> 
+
+        <br>
         <label for="log_res">
                log resolution = <span id="log-res-value">…</span>
         </label><br>
 
         <input type="range" min="1" max="6" id="logResolutionSlider" step=".1">
 
-        <br> 
+        <br>
         <label for="testpoints_slider">
           test points = <span id="testpoints-value">…</span>
         </label><br>
@@ -77,11 +77,11 @@
         <label for="path-weight">
                path thickness = <span id="path-weight-value">…</span>
         </label><br>
-        
+
         <input type="range" min=".25" max="5" id="path-weight" style="vertical-align: top;" step="0.25">
 
       </div>
-        
+
       <div class="options-toggle" id="zoom-toggle">
         Zoom options
       </div>
@@ -104,7 +104,7 @@
           point size
         </label><br/>
         <input type="range" min="0" max="10" value="3" id="point-scale" step="0.25"><br>
-        
+
         <label for="sliver-q">
           Sliver q = <span id="sliver-q-value">…</span>
         </label><br/>
@@ -191,24 +191,37 @@
   <!-- Data handlers go here - we can have as many as we want, probably -->
   <script type="text/javascript" src="strudelJs/dataHandlers/WaterTempData.js"></script>
   <script type="text/javascript" src="strudelJs/dataHandlers/ClipsSample.js"></script>
+  <script type="text/javascript" src="strudelJs/dataHandlers/IgStream.js"></script>
   <script type="text/javascript" src="strudelJs/SpiralTimelineController.js"></script>
 
   <script>
 
     /* PMB: I had to move all of the interface-building code into the Ajax
      * handler due to dependency issues. This probably isn't ideal...
-     */ 
-    $.ajax('data/daily_water_temp.json').success(function(result) {
+     */
+
+
+     // ETC: Someday we will do this in a way that isn't hack-y...
+     // Not today, though :P
+
+    $.ajax('data/ig_etc.json').success(function (result)  {
+
+      var dataHandler = new strudel.dataHandlers.IgStream(result);
+
+//    $.ajax('data/daily_water_temp.json').success(function(result) {
 //    $.ajax('data/clips_sample.json').success(function goTimeline(result)  {
 
-      var dataHandler = new strudel.dataHandlers.WaterTempData();
+//      var dataHandler = new strudel.dataHandlers.WaterTempData();
 //      var dataHandler = new strudel.dataHandlers.ClipsSample();
+
       var spiral = new strudel.SpiralTimelineController();
       var data = dataHandler.processData(result);
       spiral.updateData(data);
       spiral.init();
-      spiral.setPointColors();
+      //spiral.setPointColors();
+
     });
+
 
   </script>
 

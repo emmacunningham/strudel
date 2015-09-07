@@ -15,6 +15,39 @@ strudel.dataHandlers = strudel.dataHandlers || {};
  */
 strudel.dataHandlers.IgStream = function() {
 
+  //this.seed = seed;
+
+  this.limit = 100;
+
+  this.processedData = [];
+
+  //this.makeRequest(this.seed);
+
+};
+
+/* IG API limits us to 32 posts per request
+ * So for now, our quick hack will cycle through a few rounds of
+ * pagination links until we get our shit sorted
+ * @params {String} url - somewhere to start.
+ */
+strudel.dataHandlers.IgStream.prototype.makeRequest = function(url) {
+  var self = this;
+  $.ajax({
+    url: url,
+    dataType: 'jsonp'
+  }).done(function(result) {
+    self.megaData.push(result['data']);
+    self.limit--;
+    if (self.limit > 0) {
+      var nextPage = result['pagination']['next_url'];
+      setTimeout(function() {
+        self.makeRequest(nextPage);
+      }, 1000);
+    }
+
+  });
+
+
 };
 
 // Group scoring instances by game_id.
@@ -22,6 +55,30 @@ strudel.dataHandlers.IgStream = function() {
 // rotation on spiral.
 strudel.dataHandlers.IgStream.prototype.processData = function(data) {
 
+
+  var flatData = _.flatten(data);
+  var result = {};
+  //console.log(flatData);
+  result['points'] = [];
+  result['attributes'] = {};
+  result.attributes['colorVar'] = {'label': 'temp', 'lowColor': 'blue', 'highColor': 'red'};
+  result.attributes['tooltipLabels'] = ['date', 'temp'];
+  result.attributes['timeSeries'] = {'label': 'timestamp', 'type': 'calendrical', 'unitsPerRotation': 31556900};
+
+  for (var i = 0; i < flatData.length; i++) {
+    //var rotation_id = flatData[i].rotation_id;
+    //var time = flatData[i].time + (rotation_id * 48);
+    var instance = {
+      'time': flatData[i]['created_time']
+    };
+    result.points.push(instance);
+  }
+
+
+  return result;
+
+
+  /*
   // Remove all non-clipper scoring instances
   var clipScores = _.filter(data, {'scoring_team': 'Los Angeles Clippers'});
 
@@ -76,4 +133,6 @@ strudel.dataHandlers.IgStream.prototype.processData = function(data) {
 
   //this.processedData = result;
   return result;
+  */
+
 };
