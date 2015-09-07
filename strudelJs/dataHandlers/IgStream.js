@@ -64,12 +64,12 @@ strudel.dataHandlers.IgStream.prototype.processData = function(data) {
   result.attributes['colorVar'] = {'label': 'temp', 'lowColor': 'blue', 'highColor': 'red'};
   result.attributes['tooltipLabels'] = ['date', 'temp'];
   result.attributes['timeSeries'] = {'label': 'timestamp', 'type': 'calendrical', 'unitsPerRotation': 31556900};
+  var start_time = flatData[0]['created_time'];
 
-  for (var i = 0; i < flatData.length; i++) {
-    //var rotation_id = flatData[i].rotation_id;
-    //var time = flatData[i].time + (rotation_id * 48);
+  for (var i = 0; i < 30; i++) {
+    var time = flatData[i]['created_time'] - start_time;
     var instance = {
-      'time': flatData[i]['created_time']
+      'time': time
     };
     result.points.push(instance);
   }
