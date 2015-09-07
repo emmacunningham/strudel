@@ -63,17 +63,27 @@ strudel.dataHandlers.IgStream.prototype.processData = function(data) {
   result['attributes'] = {};
   result.attributes['colorVar'] = {'label': 'temp', 'lowColor': 'blue', 'highColor': 'red'};
   result.attributes['tooltipLabels'] = ['date', 'temp'];
-  result.attributes['timeSeries'] = {'label': 'timestamp', 'type': 'calendrical', 'unitsPerRotation': 31556900};
-  var start_time = flatData[0]['created_time'];
+  result.attributes['timeSeries'] = {'label': 'time', 'type': 'calendrical', 'unitsPerRotation': 31556900};
 
-  for (var i = 0; i < 30; i++) {
-    var time = flatData[i]['created_time'] - start_time;
+  // Not sure what multiplied we'll need, toolin around
+  var start_time = flatData[0]['created_time'] * 1000;
+
+  for (var i = 0; i < 500; i++) {
+    var time = start_time - flatData[i]['created_time'] * 1000;
+    var caption;
+    if (!!flatData[i]['caption'] ) {
+      caption = flatData[i]['caption']['text'];
+    }
     var instance = {
-      'time': time
+      'time': time,
+      'img': flatData[i]['images']['low_resolution']['url'],
+      'date': new Date(flatData[i]['created_time'] * 1000),
+      'user': flatData[i]['user']['username'],
+      'caption': caption,
+      'likes': flatData[i]['likes']['count']
     };
     result.points.push(instance);
   }
-
 
   return result;
 

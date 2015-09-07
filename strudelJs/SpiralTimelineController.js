@@ -282,6 +282,9 @@ strudel.SpiralTimelineController = function(params) {
 
   // Create <path> element with class line and append it to svg's last child <g>
   this.tooltip = $('body').append($('<div class="tooltip"></div>'));
+  this.igPreview = $('<img />');
+  this.tooltip.append(this.igPreview);
+
 
 }
 
@@ -894,7 +897,7 @@ strudel.SpiralTimelineController.prototype.getDataPoints = function (array, key)
     array[i]['polarCoords'] = polarCoords;
 
   }
-  console.log(array);
+  //console.log(array);
   return array;
 };
 
@@ -1236,12 +1239,20 @@ strudel.SpiralTimelineController.prototype.updatePoints = function () {
       .attr("cy", function (d) { return self.polarToCarY(d); });
 
 
+  circle.on('mouseout', function(d) {
+    self.igPreview.attr('src', '');
+  });
+
   circle.on('mouseover', function(d) {
     var outString = "";
     for (var attribute in d) {
-      if (attribute != 'polarCoords') {
+      if (attribute != 'polarCoords' && attribute != 'img') {
         outString += attribute + ": " + d[attribute] + '<br>';
         self.updateTooltip(this, outString);
+      }
+
+      if (attribute == 'img') {
+        self.igPreview.attr('src', d[attribute]);
       }
     }
 //    self.updateTooltip(this, {'player': $(this).attr('player'), 'points': $(this).attr('points')});
