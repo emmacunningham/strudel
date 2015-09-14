@@ -1239,6 +1239,7 @@ strudel.SpiralTimelineController.prototype.updatePoints = function () {
       .attr("cy", function (d) { return self.polarToCarY(d); });
 
 
+  // For some reason, tooltip doesn't update w/ image without this
   circle.on('mouseout', function(d) {
     self.igPreview.attr('src', '');
   });
