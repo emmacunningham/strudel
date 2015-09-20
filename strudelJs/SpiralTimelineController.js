@@ -63,8 +63,9 @@ strudel.SpiralTimelineController = function(params) {
    */
   this.testpoints = 12;
 
-  this.sliverQ = .0086;
-//  this.sliverQ = Math.PI / 12;
+//  this.sliverQ = .0086;
+  this.sliverQ = 1 / this.testpoints;
+
   this.sliverPhi = 1.6;
 
   /**
@@ -83,7 +84,7 @@ strudel.SpiralTimelineController = function(params) {
    * End of range to zoom over.
    * @type {Number}
    */
-  this.zoomRangeEnd = 15;
+  this.zoomRangeEnd = this.numRotations * 2;
   
   /**
    * Whether to display the data points.
@@ -227,23 +228,20 @@ strudel.SpiralTimelineController = function(params) {
   };
 
   this.scalePoint = function(d) {
-//    var r = d['polarCoords'][0]; 
-//    var theta = d['polarCoords'][1];
 
     if (d.hasOwnProperty('radius'))
       return d['radius'];
 
     return self.pointScale;
 
-//    var insideR = Math.abs(self.utils.getRadius(theta, self.zoomRangeStart, self.zoomRangeEnd, self.numRotations) - self.utils.getRadius(theta - self.sliverPhi, self.zoomRangeStart, self.zoomRangeEnd, self.numRotations));
-//    var outsideR = Math.abs(self.utils.getRadius(theta, self.zoomRangeStart, self.zoomRangeEnd, self.numRotations) - self.utils.getRadius(theta + self.sliverPhi, self.zoomRangeStart, self.zoomRangeEnd, self.numRotations));
-    
-//    var circleR = Math.min(insideR, outsideR);
-    
-//    console.log("Running scalePoint, r is " + r + ", theta is " + theta + ", zoom range is " + self.zoomRangeStart + " to " + self.zoomRangeEnd + ", numRotations is " + self.numRotations + ", insideR is " + insideR + ", outsideR is " + outsideR + ", circleR is " + circleR);
-
-//    return circleR * 2 * Math.PI;
-
+/* Code based on polar coords and Phi settings. Should work but doesn't.
+    var r = d['polarCoords'][0]; 
+    var theta = d['polarCoords'][1];
+    var insideR = Math.abs(self.utils.getRadius(theta, self.zoomRangeStart, self.zoomRangeEnd, self.numRotations) - self.utils.getRadius(theta - self.sliverPhi, self.zoomRangeStart, self.zoomRangeEnd, self.numRotations));
+    var outsideR = Math.abs(self.utils.getRadius(theta, self.zoomRangeStart, self.zoomRangeEnd, self.numRotations) - self.utils.getRadius(theta + self.sliverPhi, self.zoomRangeStart, self.zoomRangeEnd, self.numRotations));
+    var circleR = Math.min(insideR, outsideR);
+    return circleR * 2 * Math.PI;
+*/
   };
 
   /**
@@ -360,16 +358,24 @@ strudel.SpiralTimelineController.prototype.updatePath = function() {
  */
 strudel.SpiralTimelineController.prototype.updateZoomRange = function(zoomRangeStart, zoomRangeEnd) {
 
-  /* PMB - it would be nice to have something like this (but hopefully less
-   * of a hack) to keep the zoom range from jamming at .1 when the number of 
-   * rotations drops to ~2
-  if ((zoomRangeEnd - zoomRangeStart <= .1)) {
-    zoomRangeEnd = zoomRangeStart + 1;
-  }
-  */
+  /* Weirdly complicated code to avoid letting the zoom range get too small */
+  var minZoomRange = 1;
 
-  this.zoomRangeStart = zoomRangeStart;
-  this.zoomRangeEnd = zoomRangeEnd;
+  if ((zoomRangeEnd - zoomRangeStart) > minZoomRange) {
+    this.zoomRangeStart = zoomRangeStart;
+    this.zoomRangeEnd = zoomRangeEnd;
+  } else {
+    if ((zoomRangeStart + minZoomRange) > (this.numRotations * 2)) {
+      this.zoomRangeEnd = this.numRotations * 2;
+      this.zoomRangeStart =  (this.numRotations * 2) - minZoomRange;
+    } else if ((zoomRangeEnd - minZoomRange) < 0) {
+      this.zoomRangeEnd = minZoomRange;
+      this.zoomRangeStart = 0;
+    } else {
+      this.zoomRangeEnd = zoomRangeEnd;
+      this.zoomRangeStart = zoomRangeEnd - minZoomRange;
+    }
+  }
 
   this.updatePath();
 
@@ -459,6 +465,22 @@ strudel.SpiralTimelineController.prototype.updateTestpoints = function(n) {
 };
 
 /**
+ * Update height of point envelope
+ * @param {Number} n - height of envelope in non-scaled polar units
+ */
+strudel.SpiralTimelineController.prototype.updateSliverPhi = function(n) {
+
+  // adjust the text on the range slider
+  d3.select("#sliver-phi-value").text(n);
+  d3.select("#sliver-phi").property("value", n);
+
+  this.sliverPhi = n;
+
+  this.updatePath();
+
+};
+
+/**
  * Updates the path weight of the curve.
  * @param {Number} n - path weight value.
  */
@@ -515,6 +537,7 @@ strudel.SpiralTimelineController.prototype.initSliders = function() {
   this.updateResolution(this.resolution);
   this.updateLogResolution(this.resolution);
   this.updateTestpoints(this.testpoints);
+  this.updateSliverPhi(this.sliverPhi);
   this.updatePathWeight(this.pathWeight);
 
   this.updatePath();
@@ -559,19 +582,16 @@ strudel.SpiralTimelineController.prototype.addListeners = function() {
     slide: function(){
       var zoomRangeStart = $("#range").val()[0];
       var zoomRangeEnd = $("#range").val()[1];
-      //console.log($("#range").val());
       self.updateZoomRange(Number(zoomRangeStart), Number(zoomRangeEnd));
     },
     set: function(){
       var zoomRangeStart = $("#range").val()[0];
       var zoomRangeEnd = $("#range").val()[1];
-      //console.log($("#range").val());
       self.updateZoomRange(Number(zoomRangeStart), Number(zoomRangeEnd));
     },
     change: function(){
       var zoomRangeStart = $("#range").val()[0];
       var zoomRangeEnd = $("#range").val()[1];
-      //console.log($("#range").val());
       self.updateZoomRange(Number(zoomRangeStart), Number(zoomRangeEnd));
     }
   });
@@ -751,14 +771,14 @@ strudel.SpiralTimelineController.prototype.addListeners = function() {
     self.bgOpacity = Number(this.value);
     self.updateBackground();
   });
-  
+/*  
   d3.select("#sliver-q").on("input", function() {
     self.sliverQ = Number(this.value);
     d3.select("#sliver-q-value").text(this.value);
     self.updatePoints();
   });
-  
-  d3.select("#sliver-phi").on("input", function() {
+*/  
+  d3.select("#sliverPhiSlider").on("input", function() {
     self.sliverPhi = Number(this.value);
     d3.select("#sliver-phi-value").text(this.value);
     self.updatePoints();
@@ -1066,86 +1086,77 @@ strudel.SpiralTimelineController.prototype.drawTestpoints = function () {
   var sliverPhi = this.sliverPhi;
   var sliverQ = this.sliverQ;
 
- if (this.snapPoints == false) {
-  /* Draw envelopes for non-snapped points */
-  
-//  this.svg.selectAll("circle.sliverPoints").remove(); 
-
   for (var e=0; e<newPoints.length; e++) {
     var pointRadius = newPoints[e]['polarCoords'][0];
     var pointTheta = newPoints[e]['polarCoords'][1];
 
     var pointX = self.polarToCarX(newPoints[e]);
     var pointY = self.polarToCarY(newPoints[e]);
+    
+    /* Testing conversion code */
+    /*
+    var pointCart = self.utils.polarToCartesian(pointRadius, pointTheta);
+    var pointCart2 = self.polarToCar({'polarCoords': [pointRadius, pointTheta]});
+    console.log("point radius is " + pointRadius + ", theta is " + pointTheta + ", point X is " + pointCart.x + ", point Y is " + pointCart.y + ", scaled X is " + pointCart2[0] + ", scaled Y is " + pointCart2[1]);
+    var pointPolar = self.utils.cartesianToPolar(pointCart.x, pointCart.y);
+    var pointPolar2 = self.utils.cartesianToPolar(pointCart2[0], pointCart2[1]);
+    console.log("reconverted polar radius is " + pointPolar.r + ", theta is " + pointPolar.theta + ", scaled polar radius is " + pointPolar2.r + ", theta is " + pointPolar2.theta);
+    */
 
     var thisEnvelope = [];
 
-    var aRadius = self.utils.getRadius((pointTheta + sliverQ + sliverPhi), this.zoomRangeStart, this.zoomRangeEnd, this.numRotations);
-    var aTheta = pointTheta + sliverQ;
-    var bRadius = self.utils.getRadius((pointTheta - sliverQ + sliverPhi), this.zoomRangeStart, this.zoomRangeEnd, this.numRotations);
-    var bTheta = pointTheta - sliverQ;
-    var cRadius = self.utils.getRadius((pointTheta - sliverQ - sliverPhi), this.zoomRangeStart, this.zoomRangeEnd, this.numRotations);
-    var cTheta = pointTheta - sliverQ;
-    var dRadius = self.utils.getRadius((pointTheta + sliverQ - sliverPhi), this.zoomRangeStart, this.zoomRangeEnd, this.numRotations);
-    var dTheta = pointTheta + sliverQ;
-    
-    var aCart = self.polarToCar({'polarCoords': [aRadius, aTheta]});
-    var bCart = self.polarToCar({'polarCoords': [bRadius, bTheta]});
-    var cCart = self.polarToCar({'polarCoords': [cRadius, cTheta]});
-    var dCart = self.polarToCar({'polarCoords': [dRadius, dTheta]});
-    
-    thisEnvelope.push(aCart);
-    thisEnvelope.push(bCart);
-    thisEnvelope.push(cCart);
-    thisEnvelope.push(dCart);
-
-    envelopes.push(thisEnvelope);
-    
-    var jCart = self.utils.getCartIntersect(aCart[0], aCart[1], bCart[0], bCart[1], 0, 0, pointX, pointY);
-    var kCart = self.utils.getCartIntersect(cCart[0], cCart[1], dCart[0], dCart[1], 0, 0, pointX, pointY);
-
-    var sliverHeight = self.utils.getCartDistance(jCart.x, jCart.y, kCart.x, kCart.y);
-    var sliverRadius = sliverHeight / 2;
-    
-    newPoints[e]['radius'] = sliverRadius;
-    
-  }
+    if (this.snapPoints == false) {
+      /* Envelopes for non-snapped points */
   
- } else {
-  /* Draw envelopes and calculate point radii for snapped points */
-
-//  var sliverPoints = [];
-
-  for (var e=0; e<newPoints.length; e++) {
-    var pointRadius = newPoints[e]['polarCoords'][0];
-    var pointTheta = newPoints[e]['polarCoords'][1];
+      var aRadius = self.utils.getRadius((pointTheta + sliverQ + sliverPhi), this.zoomRangeStart, this.zoomRangeEnd, this.numRotations);
+      var aTheta = pointTheta + sliverQ;
+      var bRadius = self.utils.getRadius((pointTheta - sliverQ + sliverPhi), this.zoomRangeStart, this.zoomRangeEnd, this.numRotations);
+      var bTheta = pointTheta - sliverQ;
+      var cRadius = self.utils.getRadius((pointTheta - sliverQ - sliverPhi), this.zoomRangeStart, this.zoomRangeEnd, this.numRotations);
+      var cTheta = pointTheta - sliverQ;
+      var dRadius = self.utils.getRadius((pointTheta + sliverQ - sliverPhi), this.zoomRangeStart, this.zoomRangeEnd, this.numRotations);
+      var dTheta = pointTheta + sliverQ;
     
-    var pointX = self.polarToCarX(newPoints[e]);
-    var pointY = self.polarToCarY(newPoints[e]);
- 
-    var thisEnvelope = [];
-
-    var eTheta = 2*Math.PI * Math.ceil((pointTheta/(2*Math.PI)) * this.resolution) / this.resolution;
-    var eRadius = self.utils.getRadius(eTheta + sliverPhi, this.zoomRangeStart, this.zoomRangeEnd, this.numRotations);
-    var fTheta = 2*Math.PI * Math.floor((pointTheta/(2*Math.PI)) * this.resolution) / this.resolution;
-    var fRadius = self.utils.getRadius(fTheta + sliverPhi, this.zoomRangeStart, this.zoomRangeEnd, this.numRotations);
-    var gTheta = 2*Math.PI * Math.floor((pointTheta/(2*Math.PI)) * this.resolution) / this.resolution;
-    var gRadius = self.utils.getRadius(gTheta - sliverPhi, this.zoomRangeStart, this.zoomRangeEnd, this.numRotations);
-    var hTheta = 2*Math.PI * Math.ceil((pointTheta/(2*Math.PI)) * this.resolution) / this.resolution;
-    var hRadius = self.utils.getRadius(hTheta - sliverPhi, this.zoomRangeStart, this.zoomRangeEnd, this.numRotations);
-
-    var eCart = self.polarToCar({'polarCoords': [eRadius, eTheta]});
-    var fCart = self.polarToCar({'polarCoords': [fRadius, fTheta]});
-    var gCart = self.polarToCar({'polarCoords': [gRadius, gTheta]});
-    var hCart = self.polarToCar({'polarCoords': [hRadius, hTheta]});
-
-    thisEnvelope.push(eCart);
-    thisEnvelope.push(fCart);
-    thisEnvelope.push(gCart);
-    thisEnvelope.push(hCart);
+      var aCart = self.polarToCar({'polarCoords': [aRadius, aTheta]});
+      var bCart = self.polarToCar({'polarCoords': [bRadius, bTheta]});
+      var cCart = self.polarToCar({'polarCoords': [cRadius, cTheta]});
+      var dCart = self.polarToCar({'polarCoords': [dRadius, dTheta]});
     
-    envelopes.push(thisEnvelope);
-/*
+      thisEnvelope.push(aCart);
+      thisEnvelope.push(bCart);
+      thisEnvelope.push(cCart);
+      thisEnvelope.push(dCart);
+
+      envelopes.push(thisEnvelope);
+    
+      var jCart = self.utils.getCartIntersect(aCart[0], aCart[1], bCart[0], bCart[1], 0, 0, pointX, pointY);
+      var kCart = self.utils.getCartIntersect(cCart[0], cCart[1], dCart[0], dCart[1], 0, 0, pointX, pointY);
+
+    } else {
+      /* Envelope for snapped points */
+
+      var eTheta = 2*Math.PI * Math.ceil((pointTheta/(2*Math.PI)) * this.resolution) / this.resolution;
+      var eRadius = self.utils.getRadius(eTheta + sliverPhi, this.zoomRangeStart, this.zoomRangeEnd, this.numRotations);
+      var fTheta = 2*Math.PI * Math.floor((pointTheta/(2*Math.PI)) * this.resolution) / this.resolution;
+      var fRadius = self.utils.getRadius(fTheta + sliverPhi, this.zoomRangeStart, this.zoomRangeEnd, this.numRotations);
+      var gTheta = 2*Math.PI * Math.floor((pointTheta/(2*Math.PI)) * this.resolution) / this.resolution;
+      var gRadius = self.utils.getRadius(gTheta - sliverPhi, this.zoomRangeStart, this.zoomRangeEnd, this.numRotations);
+      var hTheta = 2*Math.PI * Math.ceil((pointTheta/(2*Math.PI)) * this.resolution) / this.resolution;
+      var hRadius = self.utils.getRadius(hTheta - sliverPhi, this.zoomRangeStart, this.zoomRangeEnd, this.numRotations);
+
+      var eCart = self.polarToCar({'polarCoords': [eRadius, eTheta]});
+      var fCart = self.polarToCar({'polarCoords': [fRadius, fTheta]});
+      var gCart = self.polarToCar({'polarCoords': [gRadius, gTheta]});
+      var hCart = self.polarToCar({'polarCoords': [hRadius, hTheta]});
+
+      thisEnvelope.push(eCart);
+      thisEnvelope.push(fCart);
+      thisEnvelope.push(gCart);
+      thisEnvelope.push(hCart);
+    
+      envelopes.push(thisEnvelope);
+
+/*  These calculations use polar coordinates and DON'T WORK.
     var efSlope = (eCart[1] - fCart[1]) / (eCart[0] - fCart[0]);
     var ghSlope = (gCart[1] - hCart[1]) / (gCart[0] - hCart[0]);
 
@@ -1156,29 +1167,29 @@ strudel.SpiralTimelineController.prototype.drawTestpoints = function () {
     var kCart = [ghXfactor, ghXfactor * Math.tan(pointTheta)];
 */
 
-    var jCart = self.utils.getCartIntersect(eCart[0], eCart[1], fCart[0], fCart[1], 0, 0, pointX, pointY);
-    var kCart = self.utils.getCartIntersect(gCart[0], gCart[1], hCart[0], hCart[1], 0, 0, pointX, pointY);
+      var jCart = self.utils.getCartIntersect(eCart[0], eCart[1], fCart[0], fCart[1], 0, 0, pointX, pointY);
+      var kCart = self.utils.getCartIntersect(gCart[0], gCart[1], hCart[0], hCart[1], 0, 0, pointX, pointY);
 
+    }
+      
     var sliverHeight = self.utils.getCartDistance(jCart.x, jCart.y, kCart.x, kCart.y);
     var sliverRadius = sliverHeight / 2;
     
     newPoints[e]['radius'] = sliverRadius;
 
-//    console.log("jCart is " + jCart + ", kCart is " + kCart);
+/*   
+    var jPolar = self.utils.cartesianToPolar(jCart.x, jCart.y);
+
+    console.log("jCart X is " + jCart.x + ", Y is " + jCart.y + ", jPolar R is " + jPolar.r + ", THETA is " + jPolar.theta);
+
+//    var jPolarCart = self.utils.polarToCartesian(jPolar.r, jPolar.theta);
+//    console.log("jPolarCart X is " + jPolarCart.x + ", Y is " + jPolarCart.y);
+    var jPolarCart = self.polarToCar({'polarCoords': [jPolar.r, jPolar.theta]});
+    console.log("jPolarCart X is " + jPolarCart[0] + ", Y is " + jPolarCart[1]);
+*/
 
 //    sliverPoints.push({'x': jCart.x, 'y': jCart.y, 'color': 'red'});
 //    sliverPoints.push({'x': kCart.x, 'y': kCart.y, 'color': 'green'});
-
-/*    
-    var insideR = Math.abs(self.utils.getPathRadius(pointTheta, this.zoomRangeStart, this.zoomRangeEnd, this.numRotations, this.resolution) - kPolar['r']);
-    var outsideR = Math.abs(self.utils.getPathRadius(pointTheta, this.zoomRangeStart, this.zoomRangeEnd, this.numRotations, this.resolution) - jPolar['r']);
-
-    var pointRadius = Math.min(insideR, outsideR);
-    console.log("pointRadius is " + pointRadius);
-*/
-  }
-
-//   this.plotPoints(sliverPoints, 'sliverPoints', true);
   }
 
   this.plotPoints(newPoints, 'testpoints', false);
@@ -1246,13 +1257,11 @@ strudel.SpiralTimelineController.prototype.plotPoints = function (plotData, poin
         if (isCartesian)
           return d.x;
         var xVal = self.polarToCarX(d);
-//        console.log("plotting point with r " + d['polarCoords'][0] + ", theta " + d['polarCoords'][1] + ", x is " + xVal);
         return xVal; })
       .attr("cy", function (d) {
         if (isCartesian)
           return d.y;
         var yVal = self.polarToCarY(d);
-//        console.log("plotting point with r " + d['polarCoords'][0] + ", theta " + d['polarCoords'][1] + ", y is " + yVal);
         return yVal; })
        
   points.on('click', function(d) {
@@ -1288,39 +1297,6 @@ strudel.SpiralTimelineController.prototype.updatePoints = function () {
   var colorLabel = this.dataAttributes.colorVar.label;
   var colorMap = this.createColorMap(this.datapoints, colorLabel);
   
-  // PMB -- test code for drawing barlines instead of points for data
-  // Needs a lot of work
-/*
-  this.svg.selectAll("#datalines").remove(); 
-
-  var point = this.svg.selectAll("dataline")
-    .data(plotData);
-
-  point.enter().append("line")
-    .attr("id", "datalines")
-    .attr("class", "dataline")
-    .attr("x1", function (d) { return self.polarToCarX(d); })
-    .attr("y1", function (d) { return self.polarToCarY(d); })
-    .attr("x2", function (d) {
-      var length = d['points'] * self.pointScale / self.numRotations;
-      d['polarCoords'][0] = d['polarCoords'][0] + length;
-      return self.polarToCarX(d); 
-    })
-    .attr("y2", function (d) {
-      var length = d['points'] * self.pointScale / self.numRotations;
-      d['polarCoords'][0] = d['polarCoords'][0] + length;
-      return self.polarToCarY(d);
-    })
-    .attr("stroke-width", 2)
-//    .attr("stroke", "black");
-    .attr('stroke', function(d) {
-      var playerSlug = self.slugify(d['player']);
-      var color = colorMap[playerSlug];
-      return color;
-    }); 
-
-  return;  
-*/
   var circle = this.svg.selectAll("circle.datapoints")
       .data(plotData);
 
@@ -1361,7 +1337,6 @@ strudel.SpiralTimelineController.prototype.updatePoints = function () {
   circle
       .attr("cx", function (d) { return self.polarToCarX(d); })
       .attr("cy", function (d) { return self.polarToCarY(d); });
-       
 
   circle.on('mouseover', function(d) {
     var outString = "";

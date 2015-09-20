@@ -229,7 +229,7 @@ strudel.MathUtils.prototype.getPathRadius = function(theta, d, v, l, res) {
  */
 strudel.MathUtils.prototype.polarToCartesian = function(radius, theta) {
   // Note that theta is negative, to make sure the spiral is rotated correctly
-  return { "x": (radius * Math.cos(-theta)), "y": (radius * Math.sin(-theta)) };
+  return { "x": (radius * Math.cos(-theta)), "y": (radius * Math.sin(theta)) };
 };
 
 strudel.MathUtils.prototype.cartesianToPolar = function(x, y) {
