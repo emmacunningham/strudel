@@ -104,19 +104,20 @@
           point size
         </label><br/>
         <input type="range" min="0" max="10" value="3" id="point-scale" step="0.25"><br>
-       <!-- 
+
         <label for="sliver-q">
-          Sliver q = <span id="sliver-q-value">…</span>
+          Sliver q ratio = <span id="sliver-q-value">…</span>%
         </label><br/>
-        <input type="range" min="0" max=".052" value=".0086" id="sliver-q" step="0.0001"><br>
-        -->
+        <input type="range" min="0" max="100" value="50" id="sliver-q" step="1"><br>
+
         <label for="sliverPhiSlider">
           Sliver φ = <span id="sliver-phi-value">…</span>
         </label><br/>
         <input type="range" min="0" max="3.14" value="1.6" id="sliverPhiSlider" step="0.1"><br>
 
-        <input id="show-points" type="checkbox" name="show-points" value="show-points"> <label>Show data points</label><br/>
-        <input id="show-testpoints" type="checkbox" name="show-testpoints" value="show-testpoints" checked> <label>Show test points</label><br/>
+        <input id="show-slivers" type="checkbox" name="show-slivers" value="show-slivers" checked> <label>Show data slivers</label><br/>
+        <input id="show-points" type="checkbox" name="show-points" value="show-points" > <label>Show data points</label><br/>
+        <input id="show-testpoints" type="checkbox" name="show-testpoints" value="show-testpoints"> <label>Show test points</label><br/>
         <input id="show-animation" type="checkbox" name="show-animation" value="show-animation" > <label>Show animation</label><br/>
         <input id="scale-points" type="checkbox" name="scale-points" value="scale-points" checked> <label>Scale points</label><br/>
         <input id="snap-points" type="checkbox" name="snap-points" value="snap-points" checked> <label>Snap points to path</label><br/>
@@ -189,6 +190,7 @@
   <script type="text/javascript" src="strudelJs/MathUtils.js"></script>
   <script type="text/javascript" src="strudelJs/ui/ZoomRangeSlider.js"></script>
   <!-- Data handlers go here - we can have as many as we want, probably -->
+  <script type="text/javascript" src="strudelJs/dataHandlers/AirTempData.js"></script>
   <script type="text/javascript" src="strudelJs/dataHandlers/WaterTempData.js"></script>
   <script type="text/javascript" src="strudelJs/dataHandlers/ClipsSample.js"></script>
   <script type="text/javascript" src="strudelJs/SpiralTimelineController.js"></script>
@@ -198,10 +200,12 @@
     /* PMB: I had to move all of the interface-building code into the Ajax
      * handler due to dependency issues. This probably isn't ideal...
      */ 
-    $.ajax('data/daily_water_temp.json').success(function(result) {
+    $.ajax('data/monthly_temps.json').success(function(result) {
+//    $.ajax('data/daily_water_temp.json').success(function(result) {
 //    $.ajax('data/clips_sample.json').success(function goTimeline(result)  {
 
-      var dataHandler = new strudel.dataHandlers.WaterTempData();
+      var dataHandler = new strudel.dataHandlers.AirTempData();
+//      var dataHandler = new strudel.dataHandlers.WaterTempData();
 //      var dataHandler = new strudel.dataHandlers.ClipsSample();
       var spiral = new strudel.SpiralTimelineController();
       var data = dataHandler.processData(result);
