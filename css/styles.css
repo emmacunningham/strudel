@@ -16,8 +16,8 @@ html, body {
 /* Range slider styles */
 #range {
   margin: 60px 20px;
-  height: 600px;
-}
+/*  height: 600px;
+*/}
 
 /* Temp styles for ui stuff */
 .menu-toggle {
@@ -194,4 +194,17 @@ z-index: -50;
   font-family: 'Open Sans', sans-serif;
   top: 0;
   padding: 20px 0;
+}
+
+/* ZOOM RANGE SLIDER OVERRIDES */
+.noUi-horizontal .noUi-handle {
+  width: 3.5px;
+  background: #000;
+  left: 0;
+  cursor: pointer;
+  border: none;
+}
+
+.noUi-handle:after, .noUi-handle:before {
+  background: transparent;
 }
