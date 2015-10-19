@@ -1,3 +1,6 @@
+@import url(https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700);
+
+
 body {
   font-family: 'Alegreya Sans SC', sans-serif;
   margin: 0;
@@ -77,6 +80,7 @@ html, body {
   position: absolute;
   z-index: 500;
   right: 0;
+  top: 0;
 }
 
 .menu-active .options-container {
@@ -107,8 +111,9 @@ html, body {
 /* Graph styles */
 
 svg {
-  z-index: -50;
-  position: absolute;
+/*  not sure about this...
+z-index: -50;
+*/  position: absolute;
   margin: auto;
   top: 0;
   left: 0;
@@ -143,7 +148,7 @@ svg {
   position: relative;
   width: 800px;
   height: 800px;
-  margin: 0 auto;
+  margin: 60px auto 0;
 }
 
 .divider {
@@ -178,4 +183,15 @@ svg {
 .divider-5 {
   -webkit-transform: rotate(150deg); /* Safari */
   transform: rotate(150deg);
+}
+
+.tooltip {
+  position: absolute;
+  text-align: center;
+  width: 100%;
+  z-index: 50;
+  font-size: 24px;
+  font-family: 'Open Sans', sans-serif;
+  top: 0;
+  padding: 20px 0;
 }

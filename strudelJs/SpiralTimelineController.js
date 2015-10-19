@@ -354,7 +354,7 @@ strudel.SpiralTimelineController = function(params) {
       .attr("class", "line");
 
   // Create <path> element with class line and append it to svg's last child <g>
-  this.tooltip = $('body').append($('<div class="tooltip"></div>'));
+  this.tooltip = $('body').prepend($('<div class="tooltip"></div>'));
 
 }
 
