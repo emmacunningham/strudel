@@ -15,7 +15,8 @@ html, body {
 
 /* Range slider styles */
 #range {
-  margin: 60px 20px;
+    width: 50%;
+    margin: 20px auto;
 /*  height: 600px;
 */}
 
