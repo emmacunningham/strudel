@@ -25,6 +25,7 @@ html, body {
   background-repeat: no-repeat;
   background-position: center;
   cursor: pointer;
+  float: right;
 }
 
 .strudel-options {
@@ -73,6 +74,9 @@ html, body {
   min-height: 100%;
   overflow: scroll;
   height: 100%;
+  position: absolute;
+  z-index: 500;
+  right: 0;
 }
 
 .menu-active .options-container {
@@ -97,8 +101,8 @@ html, body {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  background-image: url('../img/smartbuoy2.jpg');
-}
+/*  background-image: url('../img/smartbuoy2.jpg');
+*/}
 
 /* Graph styles */
 
@@ -135,5 +139,43 @@ svg {
   stroke-width: 1.5px;
 }
 
+.spiral-container {
+  position: relative;
+  width: 800px;
+  height: 800px;
+  margin: 0 auto;
+}
 
+.divider {
+  width: 10px;
+  height: 900px;
+  position: absolute;
+  background: #fff;
+  left: 394px;
+  top: -50px;
+}
 
+.divider-1 {
+  -webkit-transform: rotate(30deg); /* Safari */
+  transform: rotate(30deg);
+}
+
+.divider-2 {
+  -webkit-transform: rotate(60deg); /* Safari */
+  transform: rotate(60deg);
+}
+
+.divider-3 {
+  -webkit-transform: rotate(90deg); /* Safari */
+  transform: rotate(90deg);
+}
+
+.divider-4 {
+  -webkit-transform: rotate(120deg); /* Safari */
+  transform: rotate(120deg);
+}
+
+.divider-5 {
+  -webkit-transform: rotate(150deg); /* Safari */
+  transform: rotate(150deg);
+}

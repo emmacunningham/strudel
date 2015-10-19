@@ -21,34 +21,32 @@
     </div>
     <div class="strudel-options">
 
+<!--
       <div class="options-toggle" id="path-toggle">
         Path options
       </div>
       <div class="option-set" id="path-options">
+-->
         <input id="show-line" type="checkbox" name="show-line" value="show-line" checked> <label>Show path</label> <br />
-        <input id="lock-testpoints" type="checkbox" name="lock-testpoints-line" value="lock-testpoints" checked> <label>Lock test points to res</label> <br />
-        
+
+        <input id="show-dividers" type="checkbox" name="show-dividers" value="show-dividers" checked> <label>Show dividers</label> <br />
+
+
         <label for="res">
                resolution = <span id="res-value">…</span>
         </label><br>
 
         <input type="range" min="2" max="64" id="resolutionSlider" step=".1">
-        
-        <br> 
+
+        <br>
         <label for="log_res">
                log resolution = <span id="log-res-value">…</span>
         </label><br>
 
         <input type="range" min="1" max="6" id="logResolutionSlider" step=".1">
 
-        <br> 
-        <label for="testpoints_slider">
-          test points = <span id="testpoints-value">…</span>
-        </label><br>
-
-        <input type="range" min="2" max="64" id="testpointsSlider" step="1">
-
         <br>
+
         <label for="r">
                rotations = <span id="r-value">…</span>
         </label><br>
@@ -72,29 +70,41 @@
         </label><br/>
         <input type="range" min="-180" max="180" value="0" id="rotation-y" step="1"><br>
 
+        <input id="snap-points" type="checkbox" name="snap-points" value="snap-points" checked> <label>Snap points to path</label><br/>
+
         <div id="color-picker"></div>
+
+        <input id="lock-testpoints" type="checkbox" name="lock-testpoints-line" value="lock-testpoints" checked> <label>Lock test points to res</label> <br />
+
+        <label for="testpoints_slider">
+          test points = <span id="testpoints-value">…</span>
+        </label><br>
+
+        <input type="range" min="2" max="64" id="testpointsSlider" step="1">
+
+        <br>
 
         <label for="path-weight">
                path thickness = <span id="path-weight-value">…</span>
         </label><br>
-        
-        <input type="range" min=".25" max="5" id="path-weight" style="vertical-align: top;" step="0.25">
 
+        <input type="range" min=".25" max="5" id="path-weight" style="vertical-align: top;" step="0.25">
+<!--
       </div>
-        
+
       <div class="options-toggle" id="zoom-toggle">
         Zoom options
       </div>
       <div class="option-set" id="zoom-options">
-
+-->
         <div id="range">
         </div>
-      </div>
-
-      <div class="options-toggle" id="point-toggle">
+<!--       </div>
+ -->
+<!--       <div class="options-toggle" id="point-toggle">
         Point options
       </div>
-      <div class="option-set" id="point-options">
+      <div class="option-set" id="point-options"> -->
         <label for="point-opacity">
           point opacity
         </label><br/>
@@ -110,27 +120,28 @@
         </label><br/>
         <input type="range" min="0" max="100" value="50" id="sliver-q" step="1"><br>
 
-        <label for="sliverPhiSlider">
+<!--         <label for="sliverPhiSlider">
           Sliver φ = <span id="sliver-phi-value">…</span>
         </label><br/>
-        <input type="range" min="0" max="3.14" value="1.6" id="sliverPhiSlider" step="0.1"><br>
+        <input type="range" min="0" max="3.14" value="1.6" id="sliverPhiSlider" step="0.1"><br> -->
 
         <input id="show-slivers" type="checkbox" name="show-slivers" value="show-slivers" checked> <label>Show data slivers</label><br/>
         <input id="show-points" type="checkbox" name="show-points" value="show-points" > <label>Show data points</label><br/>
         <input id="show-testpoints" type="checkbox" name="show-testpoints" value="show-testpoints"> <label>Show test points</label><br/>
-        <input id="show-animation" type="checkbox" name="show-animation" value="show-animation" > <label>Show animation</label><br/>
-        <input id="scale-points" type="checkbox" name="scale-points" value="scale-points" checked> <label>Scale points</label><br/>
-        <input id="snap-points" type="checkbox" name="snap-points" value="snap-points" checked> <label>Snap points to path</label><br/>
-        <input id="color-points" type="checkbox" name="color-points" value="color-points" checked> <label>Color points</label><br/>
-        <button id="update-color-map" type="button">update colors</button>
+<!--         <input id="show-animation" type="checkbox" name="show-animation" value="show-animation" > <label>Show animation</label><br/>
+ -->
+<!--         <input id="scale-points" type="checkbox" name="scale-points" value="scale-points" checked> <label>Scale points</label><br/> -->
 
-      </div>
+<!--         <input id="color-points" type="checkbox" name="color-points" value="color-points" checked> <label>Color points</label><br/> -->
+<!--         <button id="update-color-map" type="button">update colors</button>
+ -->
+<!--       </div>
 
       <div class="options-toggle" id="background-toggle">
         Background options
       </div>
-      <div class="option-set" id="background-options">
-        <input id="show-bg" type="checkbox" name="show-bg" value="show-bg"> <label>Show background</label><br/><br/>
+      <div class="option-set" id="background-options"> -->
+<!--         <input id="show-bg" type="checkbox" name="show-bg" value="show-bg"> <label>Show background</label><br/><br/>
         <label for="bg-opacity">
           background opacity
         </label><br/>
@@ -148,9 +159,9 @@
         <label for="bg-distance">
           background distance
         </label><br/>
-        <input type="range" min="0" max="100" value="0" id="bg-distance" step="1">
-      </div>
-
+        <input type="range" min="0" max="100" value="0" id="bg-distance" step="1"> -->
+<!--       </div>
+ -->
         <!-- Old range zoom sliders can get fucked.
         <label for="d"
                style="display: inline-block; width: 240px; text-align: right">
@@ -199,7 +210,7 @@
 
     /* PMB: I had to move all of the interface-building code into the Ajax
      * handler due to dependency issues. This probably isn't ideal...
-     */ 
+     */
     $.ajax('data/monthly_temps.json').success(function(result) {
 //    $.ajax('data/daily_water_temp.json').success(function(result) {
 //    $.ajax('data/clips_sample.json').success(function goTimeline(result)  {
