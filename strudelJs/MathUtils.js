@@ -27,6 +27,11 @@ strudel.MathUtils = function() {
 };
 
 
+strudel.MathUtils.prototype.getB = function(l) {
+  return (16 * l) / (((4 * l) - 3) * (3 * Math.sqrt(5)));
+};
+
+
 /**
  * Use for wherever 't' occurs in paul's demo
  * @param {Number} d - zoom range point.
@@ -59,7 +64,7 @@ strudel.MathUtils.prototype.getP = function(z, d, v) {
  */
 strudel.MathUtils.prototype.getZ = function(d, v, l) {
   var t = this.getT(d, v);
-  return this.b * (1 - (t/l));
+  return this.getB(l) * (1 - (t/l));
 };
 
 /**
@@ -139,7 +144,7 @@ strudel.MathUtils.prototype.getRadius = function(theta, d, v, l) {
 strudel.MathUtils.prototype.getBisectingTheta = function(n, testpointsPerRotation) {
   return ((2 * n) - 1) * (Math.PI / testpointsPerRotation);
 };
-  
+
 strudel.MathUtils.prototype.getMidpointTheta = function(n, d, v, l, s) {
 
   var r = function(n, s, c, o, p, l) {
@@ -180,7 +185,7 @@ strudel.MathUtils.prototype.getPathRadius = function(theta, d, v, l, res) {
   /* Basic approach:
    * Get the on-circle radius of the point
    * Calculate the segment this point falls in
-   * Get the theta and radius of the leftmost point 
+   * Get the theta and radius of the leftmost point
    * Get the theta and radius of the rightmost point
    * Convert them all to Cartesian coordinates
    * Find the intersection
@@ -223,8 +228,8 @@ strudel.MathUtils.prototype.getPathRadius = function(theta, d, v, l, res) {
 
 };
 
-/* This function often isn't as useful as the polarToCarX/Y functions in the 
- * SpiralTimelineController because it does not take into account the zoom 
+/* This function often isn't as useful as the polarToCarX/Y functions in the
+ * SpiralTimelineController because it does not take into account the zoom
  * settings, but it is used in a few of the math functions aobve.
  */
 strudel.MathUtils.prototype.polarToCartesian = function(radius, theta) {
