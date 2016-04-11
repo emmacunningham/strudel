@@ -1247,7 +1247,7 @@ strudel.SpiralTimelineController.prototype.drawTestpoints = function () {
   var allTestPoints = Math.floor(this.testpoints * this.numRotations);
   var anglePoints = [];
   var newPoints = [];
-//  var cartesianMidpoints = [];
+  var cartesianMidpoints = [];
 
   for (var n=0; n<allTestPoints; n++) {
 
@@ -1263,11 +1263,50 @@ strudel.SpiralTimelineController.prototype.drawTestpoints = function () {
     newPoints[n] = {'polarCoords': polarCoords, 'color': '#0000FF'};
 
     // Keep track of the midpoints in Cartesian for plotting Delaunay triangles
-//    cartesianMidpoints.push(self.polarToCar({'polarCoords': polarCoords}));
+    cartesianMidpoints.push(self.polarToCar({'polarCoords': polarCoords}));
 
   }
 
   this.drawPointsWithParallelSpirals(newPoints);
+
+  this.drawVoronoiSpaces(cartesianMidpoints);
+//  this.drawDelaunayTriangles(cartesianMidpoints);
+
+}
+
+strudel.SpiralTimelineController.prototype.drawVoronoiSpaces = function (cartesianMidpoints) {
+
+  var voronoiPoints = d3.geom.voronoi(cartesianMidpoints);
+
+  this.svg.selectAll("#voronoi").remove();
+
+  var voronoiPath = this.svg.selectAll("voronoi")
+    .data(voronoiPoints);
+
+  voronoiPath.enter().append("path")
+    //.attr("class", function(d, i) { return "q" + (i % 9) + "-9"; })
+    .attr("id", "voronoi")
+    .attr("fill", "none")
+    .attr("stroke", "black")
+    .attr("d", function(d) { return "M" + d.join("L") + "Z"; });
+
+}
+
+strudel.SpiralTimelineController.prototype.drawDelaunayTriangles = function (cartesianMidpoints) {
+
+  var delaunayPoints = d3.geom.delaunay(cartesianMidpoints);
+
+  this.svg.selectAll("#delaunay").remove();
+
+  var delaunayPath = this.svg.selectAll("delaunay")
+    .data(delaunayPoints);
+  
+  delaunayPath.enter().append("path")
+    //.attr("class", function(d, i) { return "q" + (i % 9) + "-9"; })
+    .attr("id", "delaunay")
+    .attr("fill", "none")
+    .attr("stroke", "black")
+    .attr("d", function(d) { return "M" + d.join("L") + "Z"; });
 
 }
 
@@ -1525,24 +1564,7 @@ strudel.SpiralTimelineController.prototype.drawPointsWithParallelSpirals = funct
     .attr("fill","none")
     .attr("stroke-width",1);
 */
-/*
- * This code works, but we may not use it
- */
-/*
-  var voronoiPoints = d3.geom.voronoi(cartesianMidpoints);
 
-  this.svg.selectAll("#voronoi").remove();
-
-  var voronoiPath = this.svg.selectAll("voronoi")
-    .data(voronoiPoints);
-
-  voronoiPath.enter().append("path")
-    .attr("class", function(d, i) { return "q" + (i % 9) + "-9"; })
-    .attr("id", "voronoi")
-    .attr("fill", "none")
-    .attr("stroke", "black")
-    .attr("d", function(d) { return "M" + d.join("L") + "Z"; });
-*/
 };
 
 strudel.SpiralTimelineController.prototype.drawParallelSpiral = function(anchorPoints, side, lineName, lineColor) {
