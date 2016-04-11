@@ -22,7 +22,7 @@ strudel.SpiralTimelineController = function(params) {
   this.namespace = 'strudel';
 
 
-  this.displayDividers = true;
+  this.displayDividers = false;
 
   /**
    * Whether the graph should be contained within the viewport.
@@ -58,13 +58,13 @@ strudel.SpiralTimelineController = function(params) {
    * Number of path points per rotation of the spiral
    * @type {Number}
    */
-  this.resolution = 12;
+  this.resolution = 64;
 
   /**
    * Default number of test points per rotation of the spiral
    * @type {Number}
    */
-  this.testpoints = 12;
+  this.testpoints = (3 + Math.sqrt(5)) / 2;
 
 //  this.sliverQ = .0086;
   this.sliverQ = 50;
@@ -99,7 +99,7 @@ strudel.SpiralTimelineController = function(params) {
    * Whether to display the data slivers.
    * @type {boolean}
    */
-  this.showSlivers = true;
+  this.showSlivers = false;
 
   /**
    * Whether to display the test points.
@@ -380,6 +380,10 @@ strudel.SpiralTimelineController.prototype.init = function() {
 
 strudel.SpiralTimelineController.prototype.createDividers = function() {
 
+  if (!this.showDividers) {
+    return;
+  }
+
   var dividerCount = 6;
 
   // Get SVG container
@@ -493,12 +497,12 @@ strudel.SpiralTimelineController.prototype.drawRotationBins = function() {
 strudel.SpiralTimelineController.prototype.updateZoomRange = function(zoomRangeStart, zoomRangeEnd) {
 
   /* Weirdly complicated code to avoid letting the zoom range get too small */
-  var minZoomRange = 1;
+/*  var minZoomRange = 1;
 
-  if ((zoomRangeEnd - zoomRangeStart) > minZoomRange) {
+  if ((zoomRangeEnd - zoomRangeStart) > minZoomRange) {*/
     this.zoomRangeStart = zoomRangeStart;
     this.zoomRangeEnd = zoomRangeEnd;
-  } else {
+/*  } else {
     if ((zoomRangeStart + minZoomRange) > (this.numRotations * 2)) {
       this.zoomRangeEnd = this.numRotations * 2;
       this.zoomRangeStart =  (this.numRotations * 2) - minZoomRange;
@@ -509,7 +513,9 @@ strudel.SpiralTimelineController.prototype.updateZoomRange = function(zoomRangeS
       this.zoomRangeEnd = zoomRangeEnd;
       this.zoomRangeStart = zoomRangeEnd - minZoomRange;
     }
-  }
+  } */
+
+//  console.log("zoomRangeStart: " + zoomRangeStart + ", zoomRangeEnd: " + zoomRangeEnd);
 
   this.updatePath();
   this.updateRotationBins();
@@ -1556,7 +1562,7 @@ strudel.SpiralTimelineController.prototype.drawParallelSpiral = function(anchorP
             Math.floor((endPoint.theta / (2 * Math.PI)) * self.resolution);
 
     if (T < 0) {
-      console.log("a is " + a + ", T is " + T + ", Theta2: " + endPoint.theta + ", Theta1: " + startPoint.theta+  " r: " + endPoint.r + ", theta: " + endPoint.theta);
+//      console.log("a is " + a + ", T is " + T + ", Theta2: " + endPoint.theta + ", Theta1: " + startPoint.theta+  " r: " + endPoint.r + ", theta: " + endPoint.theta);
       continue;
     }
 

@@ -27,9 +27,12 @@ strudel.MathUtils = function() {
 };
 
 
+/*
+ * NOTE: B was retired on 4/10/2016
 strudel.MathUtils.prototype.getB = function(l) {
   return (16 * l) / (((4 * l) - 3) * (3 * Math.sqrt(5)));
 };
+*/
 
 
 /**
@@ -56,6 +59,7 @@ strudel.MathUtils.prototype.getP = function(z, d, v) {
 
 
 /**
+ * NOTE: Z was turned into a constant on 4/10/2016
  * Corresponds to the z function in paul's demo.
  * @param {Number} d - zoom range point.
  * @param {Number} v - zoom range point.
@@ -63,9 +67,11 @@ strudel.MathUtils.prototype.getP = function(z, d, v) {
  * @return {Number} - z?
  */
 strudel.MathUtils.prototype.getZ = function(d, v, l) {
-  var t = this.getT(d, v);
-  return this.getB(l) * (1 - (t/l));
+//  var t = this.getT(d, v);
+//  return this.getB(l) * (1 - (t/l));
+  return 3 - Math.sqrt(5);
 };
+
 
 /**
  * Corresponds to the o function in paul's demo.
@@ -96,14 +102,14 @@ strudel.MathUtils.prototype.getW = function(d, v) {
  * @return {Number} - c?
  */
 strudel.MathUtils.prototype.getC = function(o, w, l, bigP) {
-  if (bigP >= 0) {
-    return w - (o * Math.log(bigP));
-  }
-
+//  if (bigP >= 0) {
+  return w - (o * Math.log(bigP));
+//  }
+/*
   if (bigP < 0) {
     return (3 * l) * ((w - (l *.5)) / (Math.abs(w - (l *.5))));
   }
-
+*/
 };
 
 /**
