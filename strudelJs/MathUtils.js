@@ -148,7 +148,8 @@ strudel.MathUtils.prototype.getRadius = function(theta, d, v, l) {
 };
 
 strudel.MathUtils.prototype.getBisectingTheta = function(n, testpointsPerRotation) {
-  return ((2 * n) - 1) * (Math.PI / testpointsPerRotation);
+//  return ((2 * n) - 1) * (Math.PI / testpointsPerRotation);
+  return (n - 1) * ((2 * Math.PI) / testpointsPerRotation);
 };
 
 strudel.MathUtils.prototype.getMidpointTheta = function(n, d, v, l, s) {
@@ -198,6 +199,9 @@ strudel.MathUtils.prototype.getPathRadius = function(theta, d, v, l, res) {
    * Convert the intersection to polar coordinates
    * Return the radius of the intersection point
    */
+
+  if (theta == 0)
+    return 0;
 
   // This is the radius of the point on the circle
   var circleRadius = this.getRadius(theta, d, v, l);

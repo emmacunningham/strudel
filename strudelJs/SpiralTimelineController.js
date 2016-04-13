@@ -1255,19 +1255,21 @@ strudel.SpiralTimelineController.prototype.drawTestpoints = function () {
 //    var theta = ((2 * (n+1) - 1) * (Math.PI / this.testpoints);
     var theta = self.utils.getBisectingTheta(n+1, this.testpoints);
     var polarCoords = this.newDataGenerator(this.zoomRangeStart, this.zoomRangeEnd, this.numRotations, true)(theta);
-    anglePoints[n] = {'polarCoords': polarCoords, 'color': '#FF0000'};
+//    anglePoints[n] = {'polarCoords': polarCoords, 'color': '#FF0000'};
 
-    var theta = self.utils.getMidpointTheta(n+1, this.zoomRangeStart, this.zoomRangeEnd, this.numRotations, this.testpoints);
-    var polarCoords = this.newDataGenerator(this.zoomRangeStart, this.zoomRangeEnd, this.numRotations, true)(theta);
+//    var theta = self.utils.getMidpointTheta(n+1, this.zoomRangeStart, this.zoomRangeEnd, this.numRotations, this.testpoints);
+//    var polarCoords = this.newDataGenerator(this.zoomRangeStart, this.zoomRangeEnd, this.numRotations, true)(theta);
 
     newPoints[n] = {'polarCoords': polarCoords, 'color': '#0000FF'};
 
     // Keep track of the midpoints in Cartesian for plotting Delaunay triangles
+    var theCartCoords = self.polarToCar({'polarCoords': polarCoords});
     cartesianMidpoints.push(self.polarToCar({'polarCoords': polarCoords}));
 
   }
 
   this.drawPointsWithParallelSpirals(newPoints);
+  this.plotPoints(newPoints, 'testpoints', 'polar');
 
   this.drawVoronoiSpaces(cartesianMidpoints);
 //  this.drawDelaunayTriangles(cartesianMidpoints);
