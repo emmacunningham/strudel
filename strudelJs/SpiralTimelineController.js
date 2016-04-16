@@ -87,7 +87,7 @@ strudel.SpiralTimelineController = function(params) {
    * End of range to zoom over.
    * @type {Number}
    */
-  this.zoomRangeEnd = this.numRotations * 2;
+  this.zoomRangeEnd = this.numRotations;
 
   /**
    * Whether to display the data points.

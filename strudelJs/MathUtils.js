@@ -80,7 +80,7 @@ strudel.MathUtils.prototype.getZ = function(d, v, l) {
  * @return {Number} - o?
  */
 strudel.MathUtils.prototype.getO = function(d, v) {
-  return this.getT(d, v) / 2 * Math.log(5);
+  return this.getT(d, v) / (2 * Math.log(5));
 };
 
 /**
@@ -121,8 +121,8 @@ strudel.MathUtils.prototype.getC = function(o, w, l, bigP) {
  */
 strudel.MathUtils.prototype.getBigP = function(p, l, w) {
 
-  return (2 * Math.exp(p * (l - w))) - Math.exp(l * p) - 1 /
-         (2 * Math.exp(w * p) - Math.exp(l * p) - 1);
+  return ((2 * Math.exp(p * (l - w))) - Math.exp(l * p) - 1) /
+          (2 * Math.exp(w * p) - Math.exp(l * p) - 1);
 };
 
 
